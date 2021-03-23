@@ -6,13 +6,17 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://example.com">
-  <title>Archives: 2021 | Hexo</title>
+  <title>Python自动化调试 | Hexo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="Hexo">
-<meta property="og:url" content="http://example.com/archives/2021/index.html">
+  <meta name="description" content="pydbgpydbg是一个Python实现的Windows调试器，pydbg安装：https:&#x2F;&#x2F;blog.csdn.net&#x2F;u012397189&#x2F;article&#x2F;details&#x2F;76037857 （记得看评论，有个小坑，有32位python2.7.9），基于 pydbg，可以实现Windows下的程序自动化调试。pydbg这方面的资料似乎非常少，目前我只能通过python的help函数看看文档">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Python自动化调试">
+<meta property="og:url" content="http://example.com/2021/03/22/Python%E8%87%AA%E5%8A%A8%E5%8C%96%E8%B0%83%E8%AF%95/index.html">
 <meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="pydbgpydbg是一个Python实现的Windows调试器，pydbg安装：https:&#x2F;&#x2F;blog.csdn.net&#x2F;u012397189&#x2F;article&#x2F;details&#x2F;76037857 （记得看评论，有个小坑，有32位python2.7.9），基于 pydbg，可以实现Windows下的程序自动化调试。pydbg这方面的资料似乎非常少，目前我只能通过python的help函数看看文档">
 <meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2021-03-23T05:02:14.000Z">
+<meta property="article:modified_time" content="2021-03-23T05:03:07.213Z">
 <meta property="article:author" content="John Doe">
 <meta name="twitter:card" content="summary">
   
@@ -150,157 +154,171 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
+            <article id="post-Python自动化调试" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
   
+    <h1 class="article-title" itemprop="name">
+      Python自动化调试
+    </h1>
   
-    
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2021" class="archive-year">2021</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2021/03/22/Python%E8%87%AA%E5%8A%A8%E5%8C%96%E8%B0%83%E8%AF%95/" class="archive-article-date">
+
+        
+        <a href="/2021/03/22/Python%E8%87%AA%E5%8A%A8%E5%8C%96%E8%B0%83%E8%AF%95/" class="archive-article-date">
   	<time datetime="2021-03-23T05:02:14.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-03-22</time>
 </a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2021/03/22/Python%E8%87%AA%E5%8A%A8%E5%8C%96%E8%B0%83%E8%AF%95/">Python自动化调试</a>
-    </h1>
-  
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="pydbg"><a href="#pydbg" class="headerlink" title="pydbg"></a>pydbg</h1><p>pydbg是一个Python实现的Windows调试器，pydbg安装：<a target="_blank" rel="noopener" href="https://blog.csdn.net/u012397189/article/details/76037857">https://blog.csdn.net/u012397189/article/details/76037857</a> （记得看评论，有个小坑，有32位python2.7.9），基于 pydbg，可以实现Windows下的程序自动化调试。pydbg这方面的资料似乎非常少，目前我只能通过python的help函数看看文档</p>
+<p>在文档里找到了这几个看上去用得上的函数</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">dbg_print_all_debug_registers(self)</span><br><span class="line">bp_set(self, address, description=<span class="string">&#x27;&#x27;</span>, restore=<span class="literal">True</span>, handler=<span class="literal">None</span>)</span><br><span class="line">get_register(self, register)</span><br><span class="line"><span class="meta">@param register: One of EAX, EBX, ECX, EDX, ESI, EDI, ESP, EBP, EIP</span></span><br><span class="line">hex_dump(self, data, addr=<span class="number">0</span>, prefix=<span class="string">&#x27;&#x27;</span>)</span><br><span class="line">read(self, address, length)</span><br><span class="line">terminate_process(self, exit_code=<span class="number">0</span>, method=<span class="string">&#x27;terminateprocess&#x27;</span>)</span><br><span class="line">write(self, address, data, length=<span class="number">0</span>)</span><br><span class="line">set_register(self, register, value)</span><br><span class="line">load(self, path_to_file, command_line=<span class="literal">None</span>, create_new_console=<span class="literal">False</span>, show_window=<span class="literal">True</span>)</span><br></pre></td></tr></table></figure>
+<p>一个pydbg模板如下，来源书籍r3kapig战队的《CTF特练营》</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pydbg <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">from</span> pydbg.defines <span class="keyword">import</span> *</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">handler1</span>(<span class="params">dbg</span>):</span></span><br><span class="line">    <span class="comment"># some code here</span></span><br><span class="line">    <span class="keyword">return</span> DBG_CONTINUE</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span>():</span></span><br><span class="line">    target = <span class="string">&#x27;./reverse0.exe&#x27;</span></span><br><span class="line">    dbg = pydbg()</span><br><span class="line"></span><br><span class="line">    dbg.load(target,create_new_console=<span class="literal">True</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment">#set a break point</span></span><br><span class="line">    dbg.bp_set(<span class="number">0x411A62</span>,handler=handler1)</span><br><span class="line">    dbg.run()</span><br><span class="line"></span><br><span class="line">main()</span><br></pre></td></tr></table></figure>
+<h2 id="新玩法"><a href="#新玩法" class="headerlink" title="新玩法"></a>新玩法</h2><p>pydbg的相较于OD等传统调试器的优点在于能和python交互，方便写调试器脚本，于是我打算用pydbg写一个能自动输入flag，然后下断点，输出关键的比较数据的脚本，通过输出的关键数据可以进行爆破（失败告终）。</p>
+<p>我先写了个简单的题目</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;string.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">change</span><span class="params">(<span class="keyword">char</span> *flag)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="built_in">strlen</span>(flag); i++)</span><br><span class="line">	&#123;</span><br><span class="line">		flag[i] ^= i;</span><br><span class="line">		flag[i] -= <span class="number">3</span>;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">char</span> data[<span class="number">37</span>] = <span class="string">&quot;cj`a|2|ezS^b`w]MdvpdH^&#123;oDfeqxlno|BJ[&quot;</span>;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">char</span> flag[<span class="number">37</span>];</span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">&quot;please input your flag:\n&quot;</span>);</span><br><span class="line">	<span class="built_in">scanf</span>(<span class="string">&quot;%s&quot;</span>, flag);</span><br><span class="line">	<span class="keyword">if</span> (<span class="built_in">strlen</span>(flag) != <span class="number">36</span>)</span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">&quot;wrong length!\n&quot;</span>);</span><br><span class="line">	<span class="keyword">else</span></span><br><span class="line">	&#123;</span><br><span class="line">		change(flag);</span><br><span class="line">		<span class="keyword">if</span> (!<span class="built_in">strcmp</span>(flag, data))</span><br><span class="line">			<span class="built_in">printf</span>(<span class="string">&quot;you are right!\nyour flag is your input\n&quot;</span>);</span><br><span class="line">		<span class="keyword">else</span></span><br><span class="line">			<span class="built_in">printf</span>(<span class="string">&quot;Wrong! try again!\n&quot;</span>);</span><br><span class="line">	&#125;</span><br><span class="line">	system(<span class="string">&quot;pause&quot;</span>);</span><br><span class="line">	system(<span class="string">&quot;pause&quot;</span>);</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;<span class="comment">//flag&#123;0you_known_what_the_progrom_do&#125;</span></span><br></pre></td></tr></table></figure>
+<p>为了爆破这个程序，我写了这个脚本（有问题待解决）</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pydbg <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">from</span> pydbg.defines <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">import</span> subprocess</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">call_back1</span>(<span class="params">dbg</span>):</span></span><br><span class="line">    <span class="keyword">global</span> index</span><br><span class="line">    print(<span class="string">&quot;hello&quot;</span>)</span><br><span class="line">    EBP = dbg.get_register(<span class="string">&#x27;EBP&#x27;</span>)</span><br><span class="line">    read_data = dbg.read(EBP-<span class="number">0x2C</span>+index, <span class="number">36</span>-index)</span><br><span class="line">    print(read_data)</span><br><span class="line">    print(<span class="built_in">len</span>(read_data))</span><br><span class="line">    <span class="keyword">return</span> DBG_CONTINUE</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">call_back2</span>(<span class="params">dbg</span>):</span></span><br><span class="line">    dbg.terminate_process()</span><br><span class="line">    <span class="keyword">return</span> DBG_CONTINUE</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">burst</span>():</span></span><br><span class="line">    brust_str = <span class="string">&#x27;flag&#123;0you_known_what_the_progrom_do&#125;&#x27;</span></span><br><span class="line">    target = <span class="string">r&#x27;D:\0Study2\explore\pydbg.exe&#x27;</span></span><br><span class="line">    p = subprocess.Popen(target)</span><br><span class="line">    pid = p.pid</span><br><span class="line">    dbg = pydbg()</span><br><span class="line">    dbg.attach(pid)</span><br><span class="line">    dbg.bp_set(<span class="number">0x411A62</span>,handler=call_back1)</span><br><span class="line">    dbg.bp_set(<span class="number">0x411A93</span>,handler=call_back2)</span><br><span class="line">    dbg.run()</span><br><span class="line">    print(<span class="string">&quot;hello&quot;</span>)</span><br><span class="line">    </span><br><span class="line">    </span><br><span class="line">    </span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">    index,char = <span class="number">1</span>,<span class="number">0</span></span><br><span class="line">    burst()</span><br></pre></td></tr></table></figure>
+<p>我原本想利用subprocess实现自动输入的，但是发现pydbg  attach到这个程序后，subprocess就不能利用管道自动输入了，因为父进程易主了，subprocess失去了对程序的控制，所以需要手动输入flag。这与我一开始的想法相违背，但是我尝试了很多方法均以失败告终</p>
+<p>虽然不能自动输入，但是如果程序是以读文件的方式写入flag的话就没有这个问题了，这样我们就能下断点读取某个内存的值实现爆破了</p>
+<h1 id="PythonGdb"><a href="#PythonGdb" class="headerlink" title="PythonGdb"></a>PythonGdb</h1><p>PythonGdb使我们可以通过Python脚本来编写gdb调试脚本，详细文档 <a target="_blank" rel="noopener" href="https://sourceware.org/gdb/wiki/PythonGdbTutorial">https://sourceware.org/gdb/wiki/PythonGdbTutorial</a></p>
+<p>环境我没搭建成功，这方面的资料太少了，我这里提一下，让大家知道有这样一个自动化调试工具</p>
+<h1 id="idaPython"><a href="#idaPython" class="headerlink" title="idaPython"></a>idaPython</h1><p>这个重要性不必多说，官方文档 <a target="_blank" rel="noopener" href="https://www.hex-rays.com/wp-content/static/products/ida/support/idapython_docs/">https://www.hex-rays.com/wp-content/static/products/ida/support/idapython_docs/</a> ，官方文档里的函数太多了，看起来很痛苦，国内似乎也没有很好的归纳文章，列一个勉强还可以的 <a target="_blank" rel="noopener" href="https://wizardforcel.gitbooks.io/grey-hat-python/content/43.html">https://wizardforcel.gitbooks.io/grey-hat-python/content/43.html</a> </p>
+<p>逆向的话用的最多的就是idc库的<code>get_bytes</code>和<code>patch_bytes</code>了</p>
 
-        <div class="article-info info-on-right">
-          
-          
+      
 
+      
+        <div class="page-reward">
+          <a href="javascript:;" class="page-reward-btn tooltip-top">
+            <div class="tooltip tooltip-east">
+            <span class="tooltip-item">
+              赏
+            </span>
+            <span class="tooltip-content">
+              <span class="tooltip-text">
+                <span class="tooltip-inner">
+                  <p class="reward-p"><i class="icon icon-quo-left"></i>谢谢你请我吃糖果<i class="icon icon-quo-right"></i></p>
+                  <div class="reward-box">
+                    
+                    
+                  </div>
+                </span>
+              </span>
+            </span>
+          </div>
+          </a>
         </div>
-        <div class="clearfix"></div>
-    </header>
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
+        </div>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//pan.baidu.com/share/qrcode?url=http://example.com/2021/03/22/Python%E8%87%AA%E5%8A%A8%E5%8C%96%E8%B0%83%E8%AF%95/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
+
   
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2021/03/18/%E5%AE%89%E5%8D%93%E9%80%86%E5%90%91checklist/" class="archive-article-date">
-  	<time datetime="2021-03-19T05:23:59.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-03-18</time>
-</a>
+<nav id="article-nav">
+  
+  
+    <a href="/2021/03/18/%E5%AE%89%E5%8D%93%E9%80%86%E5%90%91checklist/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">安卓逆向checklist</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
         </div>
-    	 
+        
+        
+    </div>
+</aside>
+
+
+
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2021/03/18/%E5%AE%89%E5%8D%93%E9%80%86%E5%90%91checklist/">安卓逆向checklist</a>
-    </h1>
+  
   
 
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2021/03/17/vnctf2021-FilpGame/" class="archive-article-date">
-  	<time datetime="2021-03-17T10:25:37.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-03-17</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2021/03/17/vnctf2021-FilpGame/">vnctf2021-FilpGame</a>
-    </h1>
   
 
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2021/03/14/ELF%E5%87%BD%E6%95%B0%E5%88%A9%E7%94%A8-1/" class="archive-article-date">
-  	<time datetime="2021-03-14T11:25:01.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-03-14</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2021/03/14/ELF%E5%87%BD%E6%95%B0%E5%88%A9%E7%94%A8-1/">ELF函数利用</a>
-    </h1>
   
 
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
   
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2021/01/29/Linux-Ubuntu%E6%90%AD%E5%BB%BAHexo%E5%8D%9A%E5%AE%A2/" class="archive-article-date">
-  	<time datetime="2021-01-30T04:52:04.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-01-29</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2021/01/29/Linux-Ubuntu%E6%90%AD%E5%BB%BAHexo%E5%8D%9A%E5%AE%A2/">Linux-Ubuntu搭建Hexo博客</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-  
-    </div></section>
-  
-
-    
 
 
           </div>
@@ -323,8 +341,8 @@
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: false,
-		isArchive: true,
+		isPost: true,
+		isArchive: false,
 		isTag: false,
 		isCategory: false,
 		open_in_new: false,
