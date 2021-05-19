@@ -152,6 +152,119 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-ELF函数利用" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/01/30/ELF%E5%87%BD%E6%95%B0%E5%88%A9%E7%94%A8/">ELF函数利用</a>
+    </h1>
+  
+
+        
+        <a href="/2021/01/30/ELF%E5%87%BD%E6%95%B0%E5%88%A9%E7%94%A8/" class="archive-article-date">
+  	<time datetime="2021-01-31T04:52:04.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-01-30</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="映射函数到指定内存进行利用"><a href="#映射函数到指定内存进行利用" class="headerlink" title="映射函数到指定内存进行利用"></a>映射函数到指定内存进行利用</h1><blockquote>
+<p>灵感来源于比赛D^3CTF赛题ancient</p>
+</blockquote>
+<p>有这样一个场景，某个ELF文件，里面有一个函数，参数是flag其中一个字符，若正确返回1，错误返回0 ，main 函数调用这个函数逐字符判断flag是否正确。但是这个函数较为复杂，我们无法分析清楚，是个黑盒。显然可以逐字符爆破，但是，怎么爆破？这里我将提供一种思路：mmap映射该函数到内存，然后调用该函数进行爆破</p>
+<p>思路</p>
+<ol>
+<li>环境搭建</li>
+<li>dump内存</li>
+<li>mmap映射并爆破</li>
+</ol>
+<h2 id="环境搭建"><a href="#环境搭建" class="headerlink" title="环境搭建"></a>环境搭建</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vim sayhello.c</span><br></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">check</span><span class="params">(<span class="keyword">int</span> n)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">        <span class="keyword">int</span> n;</span><br><span class="line">        <span class="built_in">scanf</span>(<span class="string">&quot;%d&quot;</span>,&amp;n);</span><br><span class="line">        <span class="keyword">if</span>(check(n)==<span class="number">1</span>)</span><br><span class="line">        &#123;</span><br><span class="line">                <span class="built_in">printf</span>(<span class="string">&quot;%s&quot;</span>,<span class="string">&quot;hello world&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">        &#123;</span><br><span class="line">                <span class="built_in">printf</span>(<span class="string">&quot;%s&quot;</span>,<span class="string">&quot;wrong&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">check</span><span class="params">(<span class="keyword">int</span> n)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(n==<span class="number">360</span>)</span><br><span class="line">                <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">                <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gcc sayhello.c -no-pie -o .&#x2F;hello64</span><br></pre></td></tr></table></figure>
+<h2 id="dump内存"><a href="#dump内存" class="headerlink" title="dump内存"></a>dump内存</h2><p>ida 分析一下<code>hello64</code>程序，发现要完整内存在0x400000到0x405000之间</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gdb .&#x2F;hello64</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">gef➤  start</span><br><span class="line">gef➤  dump binary memory .&#x2F;hello64_dump 0x400000 0x405000 </span><br><span class="line">gef➤  q</span><br></pre></td></tr></table></figure>
+<h2 id="mmap映射并爆破"><a href="#mmap映射并爆破" class="headerlink" title="mmap映射并爆破"></a>mmap映射并爆破</h2><p>编写 利用程序 use</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vim use.c</span><br></pre></td></tr></table></figure>
+<p><code>0x401205</code>是文件<code>hello64</code>  check函数地址</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/types.h&gt;//这里提供类型pid_t和size_t的定义</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/stat.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;fcntl.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/mman.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">int</span> n = <span class="number">0</span>;</span><br><span class="line">	int fd = open(&#x27;./hello64_dump&#x27;,O_RDONLY);</span><br><span class="line">	mmap((<span class="keyword">void</span> *)<span class="number">0x400000</span>,<span class="number">0x5000</span>,PROT_EXEC | PROT_READ | PROT_WRITE ,MAP_PRIVATE |MAP_FIXED,fd,<span class="number">0</span>);</span><br><span class="line">	close(fd);</span><br><span class="line">	mprotect((<span class="keyword">void</span> *)<span class="number">0x400000</span>, <span class="number">0x5000</span>, PROT_EXEC | PROT_READ);</span><br><span class="line">	<span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;<span class="number">1000</span>;i++)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="keyword">if</span>(((<span class="keyword">int</span> (*)(<span class="keyword">int</span>))<span class="number">0x401205</span>)(n) == <span class="number">1</span>)</span><br><span class="line">			<span class="built_in">printf</span>(<span class="string">&quot;success:%d\n&quot;</span>,i);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">&quot;finish\n&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">4eve3n1ght@ubuntu:~&#x2F;Desktop&#x2F;re$ gcc use.c -o .&#x2F;use</span><br><span class="line">4eve3n1ght@ubuntu:~&#x2F;Desktop&#x2F;re$ .&#x2F;use</span><br><span class="line">success:360</span><br><span class="line">finish</span><br></pre></td></tr></table></figure>
+<p>参考文献</p>
+<ul>
+<li>mprotect用法<a target="_blank" rel="noopener" href="https://blog.csdn.net/Roland_Sun/article/details/33728955">https://blog.csdn.net/Roland_Sun/article/details/33728955</a></li>
+<li>open用法<a target="_blank" rel="noopener" href="https://blog.csdn.net/renlonggg/article/details/80701949">https://blog.csdn.net/renlonggg/article/details/80701949</a></li>
+<li>mmap函数用法<a target="_blank" rel="noopener" href="https://blog.csdn.net/yangle4695/article/details/52139585">https://blog.csdn.net/yangle4695/article/details/52139585</a></li>
+</ul>
+<h1 id="Patch程序输出关键数据利用"><a href="#Patch程序输出关键数据利用" class="headerlink" title="Patch程序输出关键数据利用"></a>Patch程序输出关键数据利用</h1><p>另外一个思路：Patch程序，使得程序自己输出关键数据，利用pwntool检查关键数据并进行爆破</p>
+<h2 id="环境搭建-1"><a href="#环境搭建-1" class="headerlink" title="环境搭建"></a>环境搭建</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vim xor.c</span><br></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">switch_input</span><span class="params">(<span class="keyword">char</span>* input)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="comment">// input = &quot;hello_mmy_friend&quot;</span></span><br><span class="line">	<span class="keyword">char</span>* input = <span class="built_in">malloc</span>(<span class="number">0x10</span>);</span><br><span class="line">	<span class="built_in">scanf</span>(<span class="string">&quot;%s&quot;</span>,input);</span><br><span class="line">	switch_input(input);</span><br><span class="line">	<span class="keyword">if</span>(!<span class="built_in">strcmp</span>(input,<span class="string">&quot;KFOOL|NNZ|EQJFMG&quot;</span>))</span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">&quot;%s&quot;</span>,<span class="string">&quot;you are right&quot;</span>);</span><br><span class="line">	<span class="keyword">else</span></span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">&quot;%s&quot;</span>,<span class="string">&quot;wrong!&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">switch_input</span><span class="params">(<span class="keyword">char</span>* input)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;<span class="built_in">strlen</span>(input);i++)</span><br><span class="line">		input[i] ^= <span class="number">35</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gcc xor.c -no-pie -o .&#x2F;xor</span><br></pre></td></tr></table></figure>
+<h2 id="Patch程序"><a href="#Patch程序" class="headerlink" title="Patch程序"></a>Patch程序</h2><p>这里我使用 ida 的 KeyPatch 插件把<code>if ( !strcmp(s1, &quot;KFOOL|NNZ|EQJFMG&quot;) )</code> 的汇编代码改成了<code>printf(&quot;%s&quot;,s1)</code>，然后直接 jmp 到 main函数末尾</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">.text:00000000004011E8 ; 6:   switch_input(s1);</span><br><span class="line">.text:00000000004011E8                 mov     rax, [rbp+s1]</span><br><span class="line">.text:00000000004011EC                 mov     rdi, rax</span><br><span class="line">.text:00000000004011EF                 call    switch_input</span><br><span class="line">.text:00000000004011F4 ; 7:   if ( !strcmp(s1, &quot;KFOOL|NNZ|EQJFMG&quot;) )</span><br><span class="line">.text:00000000004011F4                 mov     rsi, rdi        ; Keypatch modified this from:</span><br><span class="line">.text:00000000004011F4                                         ;   mov rax, [rbp+s1]</span><br><span class="line">.text:00000000004011F4                                         ;   lea rsi, s2</span><br><span class="line">.text:00000000004011F4                                         ; Keypatch padded NOP to next boundary: 4 bytes</span><br><span class="line">.text:00000000004011F4                                         ; Keypatch modified this from:</span><br><span class="line">.text:00000000004011F4                                         ;   mov rdi, offset format</span><br><span class="line">.text:00000000004011F4                                         ; Keypatch padded NOP to next boundary: 4 bytes</span><br><span class="line">.text:00000000004011F7                 mov     rdi, offset format ; Keypatch modified this from:</span><br><span class="line">.text:00000000004011F7                                         ;   nop</span><br><span class="line">.text:00000000004011F7                                         ;   nop</span><br><span class="line">.text:00000000004011F7                                         ;   nop</span><br><span class="line">.text:00000000004011F7                                         ;   nop</span><br><span class="line">.text:00000000004011F7                                         ;   nop</span><br><span class="line">.text:00000000004011F7                                         ;   nop</span><br><span class="line">.text:00000000004011F7                                         ;   nop</span><br><span class="line">.text:00000000004011FE                 call    _printf         ; Keypatch modified this from:</span><br><span class="line">.text:00000000004011FE                                         ;   nop</span><br><span class="line">.text:00000000004011FE                                         ;   mov rdi, rax</span><br><span class="line">.text:00000000004011FE                                         ;   call _strcmp</span><br><span class="line">.text:00000000004011FE                                         ; Keypatch padded NOP to next boundary: 4 bytes</span><br><span class="line">.text:00000000004011FE                                         ; Keypatch modified this from:</span><br><span class="line">.text:00000000004011FE                                         ;   call ___isoc99_scanf</span><br><span class="line">.text:0000000000401203                 jmp     short locret_401242 ; Keypatch modified this from:</span><br><span class="line">.text:0000000000401203                                         ;   nop</span><br><span class="line">.text:0000000000401203                                         ;   nop</span><br><span class="line">.text:0000000000401205 ; ---------------------------------------------------------------------------</span><br><span class="line">.text:0000000000401205                 nop</span><br><span class="line">.text:0000000000401206                 nop</span><br></pre></td></tr></table></figure>
+<p>命名为<code>./xor_patched</code>，运行一下程序</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">4eve3n1ght@ubuntu:~&#x2F;Desktop&#x2F;re$ .&#x2F;xor_patched </span><br><span class="line">312312aaa</span><br><span class="line">BBB</span><br></pre></td></tr></table></figure>
+<p>这里只回显了可打印的字符串，无法打印的字节序列要通过pwntool才能看到</p>
+<h2 id="利用脚本"><a href="#利用脚本" class="headerlink" title="利用脚本"></a>利用脚本</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/python3</span></span><br><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line">cmp_data = <span class="string">&#x27;KFOOL|NNZ|EQJFMG&#x27;</span></span><br><span class="line">print_table = <span class="string">&quot;0123456789_qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM&quot;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">burst</span>(<span class="params">offset,cmp_char</span>):</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(print_table)):</span><br><span class="line">        <span class="comment"># sleep(0.3)</span></span><br><span class="line">        p = process(<span class="string">&#x27;./xor_patched&#x27;</span>)</span><br><span class="line">        payload = <span class="string">b&#x27;0&#x27;</span>*offset + print_table[i].encode() + <span class="string">b&#x27;0&#x27;</span>*(<span class="number">15</span>-offset)</span><br><span class="line">        p.sendline(payload)</span><br><span class="line">        recv = p.recv()</span><br><span class="line">        p.close()</span><br><span class="line">        <span class="keyword">if</span> recv[offset] == <span class="built_in">ord</span>(cmp_char):</span><br><span class="line">            <span class="keyword">return</span> print_table[i]</span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line">    <span class="keyword">return</span> -<span class="number">1</span></span><br><span class="line">flag = <span class="string">&quot;&quot;</span></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">16</span>):</span><br><span class="line">    flag += burst(i,cmp_data[i])</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">print(flag)</span><br></pre></td></tr></table></figure>
+<p>执行脚本得到 <code>hello_mmy_friend</code></p>
+<h1 id="说点什么"><a href="#说点什么" class="headerlink" title="说点什么"></a>说点什么</h1><p>本人是一名2019级信息安全专业的学生，学习计算机技术有一年半多了。从刚入学对计算机一片空白，到现在也算是摸清计算机体系的脉络了。我是个CTFer，主要负责Reverse方向的赛题，逆向分析主要是经验的积累，但是我这最近半年为了开拓视野，学习了各个方面的知识，并没有花精力在逆向上，逆向实力处于一个半调子水平，比赛的时候经常自闭后摸鱼，所以Reverse方向上总是拖队伍后腿。</p>
+<p>最近无所事事不知道自己该干什么，或许是时候重新拾起逆向了，接下来我可能会发blog分享一些我的收获</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">reverse ctf</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2021/01/30/ELF%E5%87%BD%E6%95%B0%E5%88%A9%E7%94%A8/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-Linux-Ubuntu搭建Hexo博客" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -362,6 +475,10 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">misc crypto</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">reverse 多线程 爆破</a>
               </li>
             
             <div class="clearfix"></div>
