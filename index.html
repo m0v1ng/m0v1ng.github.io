@@ -152,6 +152,112 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-m0leConCTF2021逆向Automatic-Rejection-Machine题解" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/05/20/m0leConCTF2021%E9%80%86%E5%90%91Automatic-Rejection-Machine%E9%A2%98%E8%A7%A3/">m0leConCTF2021逆向Automatic Rejection Machine题解</a>
+    </h1>
+  
+
+        
+        <a href="/2021/05/20/m0leConCTF2021%E9%80%86%E5%90%91Automatic-Rejection-Machine%E9%A2%98%E8%A7%A3/" class="archive-article-date">
+  	<time datetime="2021-05-20T14:39:58.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-05-20</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>程序逻辑不难分析，但是我还是踩了坑</p>
+<h3 id="第一个坑"><a href="#第一个坑" class="headerlink" title="第一个坑"></a>第一个坑</h3><p>程序3个字符为一组进行加密，由于程序逻辑清晰，本来是决定用VS2017重构IDA的伪代码，然后进行爆破的，搞了一天没搞对，这是个很笨的方法，VS2017会报各种栈溢出的错，而且IDA的 c 伪代码是不可信的，以后不到万不得已不会再用这个方法了</p>
+<h3 id="第二个坑"><a href="#第二个坑" class="headerlink" title="第二个坑"></a>第二个坑</h3><p>我用Python复原代码，但是Python不像c语言那样有整数类型，导致代码重构的时候，总是要把数字与&amp;上一个 <code>0xffffffffffffffff</code> ，导致Python代码实际可读性很差，容易粗心大意犯错，下次我会采用c语言来复原代码了</p>
+<h3 id="第三个坑"><a href="#第三个坑" class="headerlink" title="第三个坑"></a>第三个坑</h3><p>环境搭建，我的调试是这样的，首先开启一个终端</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">qemu-aarch64 -g 1234  -L &#x2F;usr&#x2F;aarch64-linux-gnu .&#x2F;challenge</span><br></pre></td></tr></table></figure>
+<p>然后再开启一个终端</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gdb-multiarch .&#x2F;challenge -q</span><br></pre></td></tr></table></figure>
+<p>然后在gdb中远程连接1234端口</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">target  remote 127.0.0.1:1234</span><br></pre></td></tr></table></figure>
+<p>每次我想让程序重新开始，都要重复上述步骤，太烦了</p>
+<p>对此，我实在受不了这种重复的工作了，于是我写了个脚本自动化配环境</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/python3</span></span><br><span class="line"><span class="keyword">import</span> os</span><br><span class="line">path = <span class="string">&quot;../challenge&quot;</span></span><br><span class="line">port = <span class="number">2000</span></span><br><span class="line">breakpoints = []</span><br><span class="line"><span class="comment"># 1234567890abcdefghijklmnobqrstuv</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># ./env_script</span></span><br><span class="line">f = <span class="built_in">open</span>(<span class="string">&quot;./env_script&quot;</span>,<span class="string">&quot;w+&quot;</span>)</span><br><span class="line">content = <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">#!/bin/bash</span></span><br><span class="line"><span class="string">port=&#123;&#125;</span></span><br><span class="line"><span class="string">&quot;&quot;&quot;</span>.<span class="built_in">format</span>(port)</span><br><span class="line">content += <span class="string">r&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">state=`netstat  -anp  |grep  $port`</span></span><br><span class="line"><span class="string">echo $state</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">if [ -z $state]</span></span><br><span class="line"><span class="string">then</span></span><br><span class="line"><span class="string">	echo &quot;port is not used,success&quot;</span></span><br><span class="line"><span class="string">else</span></span><br><span class="line"><span class="string">	pid=`netstat  -anp  |grep  $port |awk &#x27;&#123;print $7&#125;&#x27;|awk -F &#x27;/&#x27; &#x27;&#123;print $1&#125;&#x27;`</span></span><br><span class="line"><span class="string">	kill -9 $pid</span></span><br><span class="line"><span class="string">fi</span></span><br><span class="line"><span class="string">&quot;&quot;&quot;</span></span><br><span class="line">content += <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">file_path=&quot;&#123;&#125;&quot;</span></span><br><span class="line"><span class="string">qemu-aarch64 -g $port -L /usr/aarch64-linux-gnu $file_path</span></span><br><span class="line"><span class="string">&quot;&quot;&quot;</span>.<span class="built_in">format</span>(path)</span><br><span class="line"><span class="comment"># print(content)</span></span><br><span class="line">f.write(content)</span><br><span class="line">f.close()</span><br><span class="line">os.system(<span class="string">&quot;chmod 777 ./env_script&quot;</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># ./debug_script</span></span><br><span class="line">f = <span class="built_in">open</span>(<span class="string">&quot;./debug_script&quot;</span>,<span class="string">&quot;w+&quot;</span>)</span><br><span class="line">content = <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">#!/bin/bash</span></span><br><span class="line"><span class="string">port=&#123;&#125;</span></span><br><span class="line"><span class="string">file_path=&quot;&#123;&#125;&quot;</span></span><br><span class="line"><span class="string">gdb-multiarch &quot;&#123;&#125;&quot; -q -x ./gdb_script</span></span><br><span class="line"><span class="string">&quot;&quot;&quot;</span>.<span class="built_in">format</span>(port,path,path)</span><br><span class="line"><span class="comment"># print(content)</span></span><br><span class="line">f.write(content)</span><br><span class="line">f.close()</span><br><span class="line">os.system(<span class="string">&quot;chmod 777 ./debug_script&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># ./gdb_script</span></span><br><span class="line">f = <span class="built_in">open</span>(<span class="string">&quot;./gdb_script&quot;</span>,<span class="string">&quot;w+&quot;</span>)</span><br><span class="line">content = <span class="string">&quot;target remote 127.0.0.1:&#123;&#125;&quot;</span>.<span class="built_in">format</span>(port)</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(breakpoints)):</span><br><span class="line">    content += <span class="string">&quot;\r\n&quot;</span></span><br><span class="line">    content += <span class="string">&quot;b *0x4000000000 + &quot;</span> + <span class="built_in">hex</span>(breakpoints[i]) </span><br><span class="line"><span class="comment"># print(content)</span></span><br><span class="line">f.write(content)</span><br><span class="line">f.close()</span><br><span class="line">os.system(<span class="string">&quot;chmod 777 ./gdb_script&quot;</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">os.system(<span class="string">&quot;gnome-terminal -e &#x27;bash -c \&quot;./env_script; exec bash\&quot;&#x27;&quot;</span>)</span><br><span class="line">os.system(<span class="string">&quot;./debug_script&quot;</span>)</span><br></pre></td></tr></table></figure>
+<p>这个脚本可以自动下断点，主要运用了 shell 脚本 + gdb 脚本，至此，调试就轻松多了</p>
+<h2 id="题解"><a href="#题解" class="headerlink" title="题解"></a>题解</h2><p>回归正题，调试比对恢复代码，最后爆破即可</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br></pre></td><td class="code"><pre><span class="line">table1 = [<span class="number">0x71</span>, <span class="number">0x77</span>, <span class="number">0x65</span>, <span class="number">0x72</span>, <span class="number">0x74</span>, <span class="number">0x79</span>, <span class="number">0x75</span>, <span class="number">0x69</span>, <span class="number">0x6f</span>, <span class="number">0x70</span>, <span class="number">0x61</span>, <span class="number">0x73</span>, <span class="number">0x64</span>, <span class="number">0x66</span>, <span class="number">0x67</span>, <span class="number">0x68</span>, <span class="number">0x6a</span>, <span class="number">0x6b</span>,</span><br><span class="line">          <span class="number">0x6c</span>, <span class="number">0x7a</span>, <span class="number">0x78</span>, <span class="number">0x63</span>, <span class="number">0x76</span>, <span class="number">0x62</span>, <span class="number">0x6e</span>, <span class="number">0x6d</span>, <span class="number">0x31</span>, <span class="number">0x32</span>, <span class="number">0x33</span>, <span class="number">0x34</span>, <span class="number">0x35</span>, <span class="number">0x36</span>]</span><br><span class="line">table2 = [<span class="number">0x71</span>, <span class="number">0x73</span>, <span class="number">0x77</span>, <span class="number">0x75</span>, <span class="number">0x74</span>, <span class="number">0x79</span>, <span class="number">0x72</span>, <span class="number">0x69</span>, <span class="number">0x6f</span>, <span class="number">0x70</span>, <span class="number">0x61</span>, <span class="number">0x65</span>, <span class="number">0x64</span>, <span class="number">0x76</span>, <span class="number">0x6e</span>, <span class="number">0x68</span>, <span class="number">0x6b</span>, <span class="number">0x6a</span>,</span><br><span class="line">          <span class="number">0x6c</span>, <span class="number">0x7a</span>, <span class="number">0x63</span>, <span class="number">0x62</span>, <span class="number">0x66</span>, <span class="number">0x78</span>, <span class="number">0x67</span>, <span class="number">0x34</span>, <span class="number">0x33</span>, <span class="number">0x32</span>, <span class="number">0x31</span>, <span class="number">0x6d</span>, <span class="number">0x35</span>, <span class="number">0x36</span>]</span><br><span class="line">table3 = []</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(table1)):</span><br><span class="line">    table3.append(table2.index(table1[i]))</span><br><span class="line">print(table3)</span><br><span class="line">s = [<span class="number">0</span> <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">60</span>)]</span><br><span class="line">s[<span class="number">0</span>] = <span class="number">0xB4D8846071AC9EE5</span></span><br><span class="line">s[<span class="number">1</span>] = <span class="number">0x1E1FF00814E134FE</span></span><br><span class="line">s[<span class="number">2</span>] = <span class="number">0x6B198E7941B7002E</span></span><br><span class="line">s[<span class="number">3</span>] = <span class="number">0xBC6FA839EFE36443</span></span><br><span class="line">s[<span class="number">4</span>] = <span class="number">0xC3C71AD9A664B6C3</span></span><br><span class="line">s[<span class="number">5</span>] = <span class="number">0x5692A2F09C98D986</span></span><br><span class="line">s[<span class="number">6</span>] = <span class="number">0xF084A1A59CD01E68</span></span><br><span class="line">s[<span class="number">7</span>] = <span class="number">0xBC52E78A7E4DF2DF</span></span><br><span class="line">s[<span class="number">8</span>] = <span class="number">0xDA219D93290B91A8</span></span><br><span class="line">s[<span class="number">9</span>] = <span class="number">0x5703D0286FA5D32F</span></span><br><span class="line">s[<span class="number">10</span>] = <span class="number">0x6274B1B118DA82B2</span></span><br><span class="line">s[<span class="number">11</span>] = <span class="number">0xA746EBFB0954EBBC</span></span><br><span class="line">s[<span class="number">12</span>] = <span class="number">0x5F6DF7BD4F1967A2</span></span><br><span class="line">s[<span class="number">13</span>] = <span class="number">0x16D5B5BDEE98CF8E</span></span><br><span class="line">s[<span class="number">14</span>] = <span class="number">0x52E8B6DF7E62E39A</span></span><br><span class="line">s[<span class="number">15</span>] = <span class="number">0x99F9455FB0C8D933</span></span><br><span class="line">s[<span class="number">16</span>] = <span class="number">0x5FFD82D53AF933D</span></span><br><span class="line">s[<span class="number">17</span>] = <span class="number">0xFF9084A16FF0141C</span></span><br><span class="line">s[<span class="number">18</span>] = <span class="number">0xE17C5F0781D52F9B</span></span><br><span class="line">s[<span class="number">19</span>] = <span class="number">0x1A0F4431548E51D1</span></span><br><span class="line">s[<span class="number">20</span>] = <span class="number">0xF2E8573D8F0F01DD</span></span><br><span class="line">s[<span class="number">21</span>] = <span class="number">0x250039177F4DEF91</span></span><br><span class="line">s[<span class="number">22</span>] = <span class="number">0x8851491ECBC7AF7C</span></span><br><span class="line">s[<span class="number">23</span>] = <span class="number">0xAD427C6695B91D24</span></span><br><span class="line">s[<span class="number">24</span>] = <span class="number">0x5E0071D97D98D094</span></span><br><span class="line">s[<span class="number">25</span>] = <span class="number">0x264DDA52B0C37B03</span></span><br><span class="line">s[<span class="number">26</span>] = <span class="number">0xA5811271D6D7C428</span></span><br><span class="line">s[<span class="number">27</span>] = <span class="number">0xE0133FC719F34136</span></span><br><span class="line">s[<span class="number">28</span>] = <span class="number">0xE508ACE2412B2633</span></span><br><span class="line">s[<span class="number">29</span>] = <span class="number">0x74321A3E9FACE34C</span></span><br><span class="line">s[<span class="number">30</span>] = <span class="number">0xFF5B8A59E8EBF70B</span></span><br><span class="line">s[<span class="number">31</span>] = <span class="number">0x76275A516F88C986</span></span><br><span class="line">s[<span class="number">32</span>] = <span class="number">0x1604D76F74599CC4</span></span><br><span class="line">s[<span class="number">33</span>] = <span class="number">0xF744BCD8F2016F58</span></span><br><span class="line">s[<span class="number">34</span>] = <span class="number">0xA0B6A7A0239E4EA7</span></span><br><span class="line">s[<span class="number">35</span>] = <span class="number">0xF1EFC57F15CB9AB4</span></span><br><span class="line">s[<span class="number">36</span>] = <span class="number">0xB0D1AD4FB4ED946A</span></span><br><span class="line">s[<span class="number">37</span>] = <span class="number">0x81CA31324D48E689</span></span><br><span class="line">s[<span class="number">38</span>] = <span class="number">0xE6A9979C51869F49</span></span><br><span class="line">s[<span class="number">39</span>] = <span class="number">0xA666637EE4BC2457</span></span><br><span class="line">s[<span class="number">40</span>] = <span class="number">0x6475B6AB4884B93C</span></span><br><span class="line">s[<span class="number">41</span>] = <span class="number">0x5C033B1207DA898F</span></span><br><span class="line">s[<span class="number">42</span>] = <span class="number">0xB66DC7E0DEC3443E</span></span><br><span class="line">s[<span class="number">43</span>] = <span class="number">0xE4899C99CFA0235C</span></span><br><span class="line">s[<span class="number">44</span>] = <span class="number">0x3B7FD8D4D0DCAF6B</span></span><br><span class="line">s[<span class="number">45</span>] = <span class="number">0xB1A4690DB34A7A7C</span></span><br><span class="line">s[<span class="number">46</span>] = <span class="number">0x8041D2607129ADAB</span></span><br><span class="line">s[<span class="number">47</span>] = <span class="number">0xA6A1294A99894F1A</span></span><br><span class="line">s[<span class="number">48</span>] = <span class="number">0xDDE37A1C4524B831</span></span><br><span class="line">s[<span class="number">49</span>] = <span class="number">0x3BC8D81DE355B65C</span></span><br><span class="line">s[<span class="number">50</span>] = <span class="number">0x6C61AB15A63AD91E</span></span><br><span class="line">s[<span class="number">51</span>] = <span class="number">0x8FA4E37F4A3C7A39</span></span><br><span class="line">s[<span class="number">52</span>] = <span class="number">0x268B598404E773AF</span></span><br><span class="line">s[<span class="number">53</span>] = <span class="number">0x74F4F040AE13F867</span></span><br><span class="line">s[<span class="number">54</span>] = <span class="number">0x4DF78E91FD682404</span></span><br><span class="line">s[<span class="number">55</span>] = <span class="number">0xABE1FC425A9A671A</span></span><br><span class="line">s[<span class="number">56</span>] = <span class="number">0x1BB06615C8A31DD5</span></span><br><span class="line">s[<span class="number">57</span>] = <span class="number">0x9F56E9AEF2FA5D55</span></span><br><span class="line">s[<span class="number">58</span>] = <span class="number">0x239DCF030B3CE09B</span></span><br><span class="line">s[<span class="number">59</span>] = <span class="number">0x24556A34B61CA998</span></span><br><span class="line">x = <span class="built_in">list</span>(<span class="built_in">map</span>(<span class="built_in">ord</span>, <span class="string">&quot;1234567890abcdefghijklmnobqrstuv&quot;</span>))</span><br><span class="line">y = [<span class="number">0</span> <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(x))]</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(x)):</span><br><span class="line">    y[table3[i]] = x[i]</span><br><span class="line">print(<span class="built_in">bytes</span>(y))</span><br><span class="line"></span><br><span class="line">y.append(y[<span class="number">0</span>])</span><br><span class="line">y.append(y[<span class="number">1</span>])</span><br><span class="line"><span class="comment"># 0x3c51f518c2cc9791</span></span><br><span class="line"><span class="comment"># 1b27564890a3cmofhgijlndketsrqbuv</span></span><br><span class="line"><span class="comment"># 1b27564890a3cmofhgijlndketsrqbuv</span></span><br><span class="line">v1 = [<span class="number">0</span> <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">2</span>)]</span><br><span class="line">v2 = [<span class="number">0</span> <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">4</span>)]</span><br><span class="line">v1[<span class="number">0</span>] = <span class="number">0x9E3779B917181920</span></span><br><span class="line">v1[<span class="number">1</span>] = <span class="number">0x9E3779B912881288</span></span><br><span class="line">v2[<span class="number">0</span>] = <span class="number">0xDEADBEEFFEEDBEEF</span></span><br><span class="line">v2[<span class="number">1</span>] = <span class="number">0x1BADB002FACECAFE</span></span><br><span class="line">v2[<span class="number">2</span>] = <span class="number">0xFEEDFACE08920892</span></span><br><span class="line">v2[<span class="number">3</span>] = <span class="number">0xCAFEFEED12401240</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">func</span>(<span class="params">v1, v2,y</span>):</span></span><br><span class="line">    v1[<span class="number">0</span>] = (y[<span class="number">2</span>] &lt;&lt; <span class="number">16</span>) | (y[<span class="number">1</span>] &lt;&lt; <span class="number">8</span>) | y[<span class="number">0</span>] | <span class="number">0xAABBCCDD11000000</span></span><br><span class="line">    <span class="comment"># print(hex(num1))</span></span><br><span class="line">    v1_c = v1.copy()</span><br><span class="line">    v2_c = v2.copy()</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">0x10</span>):</span><br><span class="line">        v3 = i &amp; <span class="number">3</span></span><br><span class="line">        v2_c[v3] = ((v2_c[<span class="number">0</span>] + v2_c[<span class="number">1</span>]) &amp; <span class="number">0xffffffffffffffff</span>) + (</span><br><span class="line">                ((v2_c[<span class="number">2</span>] + v2_c[<span class="number">3</span>]) &amp; <span class="number">0xffffffffffffffff</span>) ^ (v2_c[<span class="number">0</span>] &lt;&lt; (v2_c[<span class="number">2</span>] % <span class="number">64</span>)) &amp; <span class="number">0xffffffffffffffff</span>)</span><br><span class="line">        v2_c[v3] &amp;= <span class="number">0xffffffffffffffff</span></span><br><span class="line">        v1_c[<span class="number">0</span>] += ((((v2_c[v3] + v1_c[<span class="number">1</span>]) &lt;&lt; <span class="number">9</span>) &amp; <span class="number">0xffffffffffffffff</span>) ^ (</span><br><span class="line">                (v2_c[v3] - v1_c[<span class="number">1</span>]) &amp; <span class="number">0xffffffffffffffff</span>) ^ (</span><br><span class="line">                            ((v2_c[v3] + v1_c[<span class="number">1</span>]) &amp; <span class="number">0xffffffffffffffff</span>) &gt;&gt; <span class="number">14</span>)) &amp; <span class="number">0xffffffffffffffff</span></span><br><span class="line">        v1_c[<span class="number">0</span>] &amp;= <span class="number">0xffffffffffffffff</span></span><br><span class="line">        v1_c[<span class="number">1</span>] += ((((v2_c[v3] + v1_c[<span class="number">0</span>]) &lt;&lt; <span class="number">9</span>) &amp; <span class="number">0xffffffffffffffff</span>) ^ (</span><br><span class="line">                (v2_c[v3] - v1_c[<span class="number">0</span>]) &amp; <span class="number">0xffffffffffffffff</span>) ^ (</span><br><span class="line">                            ((v2_c[v3] + v1_c[<span class="number">0</span>]) &amp; <span class="number">0xffffffffffffffff</span>) &gt;&gt; <span class="number">14</span>)) &amp; <span class="number">0xffffffffffffffff</span></span><br><span class="line">        v1_c[<span class="number">1</span>] &amp;= <span class="number">0xffffffffffffffff</span></span><br><span class="line">    <span class="keyword">return</span> v1_c[<span class="number">0</span>], v1_c[<span class="number">1</span>]</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">brute</span>():</span></span><br><span class="line">    y = [<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>]</span><br><span class="line">    <span class="keyword">for</span> b1 <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">32</span>, <span class="number">0x7f</span>):</span><br><span class="line">        <span class="keyword">for</span> b2 <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">32</span>, <span class="number">0x7f</span>):</span><br><span class="line">            <span class="keyword">for</span> b3 <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">32</span>, <span class="number">0x7f</span>):</span><br><span class="line">                y[<span class="number">0</span>] = b1</span><br><span class="line">                y[<span class="number">1</span>] = b2</span><br><span class="line">                y[<span class="number">2</span>] = b3</span><br><span class="line">                r1,r2 = func(v1.copy(), v2.copy(), y)</span><br><span class="line">                <span class="keyword">if</span> r1 == s[<span class="number">0</span>] <span class="keyword">and</span> r2 ==s[<span class="number">1</span>]:</span><br><span class="line">                    print(b1,b2,b3)</span><br><span class="line"></span><br><span class="line"><span class="comment"># brute()</span></span><br><span class="line"><span class="comment"># 112 117 116</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">brute2</span>():</span></span><br><span class="line">    y = [<span class="number">0</span> <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">32</span>)]</span><br><span class="line">    y[<span class="number">0</span>] = <span class="number">112</span></span><br><span class="line">    y[<span class="number">1</span>] = <span class="number">117</span></span><br><span class="line">    y[<span class="number">2</span>] = <span class="number">116</span></span><br><span class="line">    y[<span class="number">30</span>] = y[<span class="number">0</span>]</span><br><span class="line">    y[<span class="number">31</span>] = y[<span class="number">1</span>]</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">1</span>,<span class="number">30</span>):</span><br><span class="line">        <span class="keyword">for</span> b <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">32</span>, <span class="number">0x7f</span>):</span><br><span class="line">            y[i+<span class="number">2</span>] = b</span><br><span class="line">            r1, r2 = func(v1.copy(), v2.copy(), y[i:i+<span class="number">3</span>])</span><br><span class="line">            <span class="keyword">if</span> r1 == s[<span class="number">2</span>*i+<span class="number">0</span>] <span class="keyword">and</span> r2 == s[<span class="number">2</span>*i+<span class="number">1</span>]:</span><br><span class="line">                func(v1, v2, y[i:i+<span class="number">3</span>])</span><br><span class="line">                <span class="keyword">break</span></span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">bytes</span>(y)</span><br><span class="line">flag = brute2().decode()</span><br><span class="line"></span><br><span class="line">ans = <span class="string">&quot;&quot;</span></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(flag)):</span><br><span class="line">    ans += flag[table3[i]]</span><br><span class="line">print(ans)</span><br><span class="line"></span><br><span class="line"><span class="comment"># ptm&#123;5m0l_chunk5_5m0l_53cur17y&#125;pu</span></span><br></pre></td></tr></table></figure>
+<p>总结一下爆破的步骤吧</p>
+<ol>
+<li>恢复代码，定义为函数func，返回要比对的值</li>
+<li>开始爆破，for循环嵌套，之后赋值，赋值后调用func，<strong>参数都是副本</strong></li>
+<li>比对结果，结果正确就记录，<strong>并且把真正参数传入func进行一次迭代</strong>，看情况退出</li>
+</ol>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">aarch64</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">reverse</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">爆破</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">gdbScript</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2021/05/20/m0leConCTF2021%E9%80%86%E5%90%91Automatic-Rejection-Machine%E9%A2%98%E8%A7%A3/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-ARM-aarch64-PWN入门" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -360,11 +466,11 @@
         		</li>
       		 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">多线程</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">爆破</a>
         		</li>
       		 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">爆破</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">多线程</a>
         		</li>
       		
 		</ul>
@@ -1071,116 +1177,6 @@
 
 
   
-    <article id="post-安卓逆向checklist" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2021/03/18/%E5%AE%89%E5%8D%93%E9%80%86%E5%90%91checklist/">安卓逆向checklist</a>
-    </h1>
-  
-
-        
-        <a href="/2021/03/18/%E5%AE%89%E5%8D%93%E9%80%86%E5%90%91checklist/" class="archive-article-date">
-  	<time datetime="2021-03-19T05:23:59.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-03-18</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="安卓逆向checklist"><a href="#安卓逆向checklist" class="headerlink" title="安卓逆向checklist"></a>安卓逆向checklist</h1><p><strong>不定期更新中</strong></p>
-<h3 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h3><ul>
-<li><p>APK文件结构，即apk文件解压后各个文件目录的作用。APK打包编译的流程</p>
-<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/aha_jasper/article/details/104944929">https://blog.csdn.net/aha_jasper/article/details/104944929</a></p>
-</li>
-<li><p>了解运行在安卓上的虚拟机</p>
-<p><a target="_blank" rel="noopener" href="https://baike.baidu.com/item/Dalvik/1996430?fr=aladdin">https://baike.baidu.com/item/Dalvik/1996430?fr=aladdin</a></p>
-<p><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/59d98244fb52">https://www.jianshu.com/p/59d98244fb52</a></p>
-</li>
-<li><p>安卓系统架构</p>
-<p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/26100298">https://zhuanlan.zhihu.com/p/26100298</a></p>
-</li>
-<li><p>安卓四大组件</p>
-<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/xchaha/article/details/80398620">https://blog.csdn.net/xchaha/article/details/80398620</a></p>
-</li>
-<li><p>了解Smali，能看懂Dalvik虚拟机字节码的反汇编</p>
-<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/yuanguozhengjust/article/details/80493963">https://blog.csdn.net/yuanguozhengjust/article/details/80493963</a></p>
-<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/dd864140130/article/details/52076515">https://blog.csdn.net/dd864140130/article/details/52076515</a></p>
-</li>
-<li><p>SDK，NDK和 JNI</p>
-<p><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/87ce6f565d37">https://www.jianshu.com/p/87ce6f565d37</a></p>
-</li>
-<li><p>ARM汇编</p>
-<p><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/99067af33f14">https://www.jianshu.com/p/99067af33f14</a></p>
-</li>
-</ul>
-<h3 id="工具使用"><a href="#工具使用" class="headerlink" title="工具使用"></a>工具使用</h3><ul>
-<li><p>Android Killer使用（CTF不怎么用），这个工具能反编译Smali层代码，可修改后再编译</p>
-<p><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/61a93a6c0c1b">https://www.jianshu.com/p/61a93a6c0c1b</a></p>
-</li>
-<li><p>JEB 调试 smali 层代码</p>
-<p><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/8e8ed503d69b">https://www.jianshu.com/p/8e8ed503d69b</a></p>
-</li>
-<li><p>IDA 调试 native 层代码</p>
-<p><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/af0ac36cdb5c">https://www.jianshu.com/p/af0ac36cdb5c</a></p>
-</li>
-<li><p>adb命令</p>
-<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_43927138/article/details/90477966">https://blog.csdn.net/weixin_43927138/article/details/90477966</a></p>
-</li>
-</ul>
-<h1 id="IDA调试so文件环境搭建"><a href="#IDA调试so文件环境搭建" class="headerlink" title="IDA调试so文件环境搭建"></a>IDA调试so文件环境搭建</h1><p>IDA调试so文件环境搭建是最麻烦的，基本搞定这个，安卓逆向环境搭建就ok了，环境搭建了一晚上，踩了不少坑，遇到报错就利用搜索引擎找解决方案，分享一下我的步骤给大家参考，我调试的是android studio的ARM架构的Nexus 5X虚拟机</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">安装apk</span><br><span class="line">adb install D:\CTF_time\easy-so.apk</span><br><span class="line"></span><br><span class="line">以root方式adb虚拟机</span><br><span class="line">adb root</span><br><span class="line"></span><br><span class="line">传入ida的android_server（ida版本一定要对应）</span><br><span class="line">adb push android_server路径 &#x2F;data&#x2F;app&#x2F;as</span><br><span class="line"></span><br><span class="line">修改权限</span><br><span class="line">chmod 777 .&#x2F;as</span><br><span class="line"></span><br><span class="line">运行</span><br><span class="line">.&#x2F;as</span><br></pre></td></tr></table></figure>
-<p>另外开一个cmd</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">这个cmd也必须adb root</span><br><span class="line"></span><br><span class="line">端口转发</span><br><span class="line">adb forward tcp:23946 tcp:23946</span><br><span class="line"></span><br><span class="line">以调试模式打开文件</span><br><span class="line">adb shell am start -D -n com.testjava.jack.pingan2&#x2F;.MainActivity</span><br></pre></td></tr></table></figure>
-<p>打开ida，以attach方式运行程序，ip填127.0.0.1，连接上后勾选3个选项：Debugger-&gt;Debugger options-&gt;<code>Suspend on process entry point</code>,<code>Suspend on library load/unload</code>,<code>Suspend on thread start/exit</code></p>
-<p>ddms查看应用端口，执行命令</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jdb -connect com.sun.jdi.SocketAttach:hostname&#x3D;localhost,port&#x3D;端口</span><br></pre></td></tr></table></figure>
-<p>然后就可以ida ，F9放行，直到看到 output窗口导入了这个so，ALT+3看module窗口，搜字符串，点击看这个so的方法，找到感兴趣的函数下断点，取消三个选项即可，再次F9即可开始调试了</p>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2021/03/18/%E5%AE%89%E5%8D%93%E9%80%86%E5%90%91checklist/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
   
     <nav id="page-nav">
       <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" href="/page/2/">Next &amp;raquo;</a>
@@ -1306,11 +1302,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">多线程</a>
+                <a href="javascript:void(0)" class="js-tag color3">爆破</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">爆破</a>
+                <a href="javascript:void(0)" class="js-tag color5">gdbScript</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">多线程</a>
               </li>
             
             <div class="clearfix"></div>

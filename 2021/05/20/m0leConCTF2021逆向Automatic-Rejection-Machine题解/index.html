@@ -6,14 +6,22 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://example.com">
-  <title>Archives: 2021 | Hexo</title>
+  <title>m0leConCTF2021逆向Automatic Rejection Machine题解 | Hexo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="Hexo">
-<meta property="og:url" content="http://example.com/archives/2021/page/2/index.html">
+  <meta name="description" content="程序逻辑不难分析，但是我还是踩了坑 第一个坑程序3个字符为一组进行加密，由于程序逻辑清晰，本来是决定用VS2017重构IDA的伪代码，然后进行爆破的，搞了一天没搞对，这是个很笨的方法，VS2017会报各种栈溢出的错，而且IDA的 c 伪代码是不可信的，以后不到万不得已不会再用这个方法了 第二个坑我用Python复原代码，但是Python不像c语言那样有整数类型，导致代码重构的时候，总是要把数字与&amp;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="m0leConCTF2021逆向Automatic Rejection Machine题解">
+<meta property="og:url" content="http://example.com/2021/05/20/m0leConCTF2021%E9%80%86%E5%90%91Automatic-Rejection-Machine%E9%A2%98%E8%A7%A3/index.html">
 <meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="程序逻辑不难分析，但是我还是踩了坑 第一个坑程序3个字符为一组进行加密，由于程序逻辑清晰，本来是决定用VS2017重构IDA的伪代码，然后进行爆破的，搞了一天没搞对，这是个很笨的方法，VS2017会报各种栈溢出的错，而且IDA的 c 伪代码是不可信的，以后不到万不得已不会再用这个方法了 第二个坑我用Python复原代码，但是Python不像c语言那样有整数类型，导致代码重构的时候，总是要把数字与&amp;">
 <meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2021-05-20T14:39:58.000Z">
+<meta property="article:modified_time" content="2021-05-20T14:51:37.023Z">
 <meta property="article:author" content="John Doe">
+<meta property="article:tag" content="aarch64">
+<meta property="article:tag" content="reverse">
+<meta property="article:tag" content="爆破">
+<meta property="article:tag" content="gdbScript">
 <meta name="twitter:card" content="summary">
   
     <link rel="alternative" href="/atom.xml" title="Hexo" type="application/atom+xml">
@@ -150,144 +158,190 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
-  
-  
+            <article id="post-m0leConCTF2021逆向Automatic-Rejection-Machine题解" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
     
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      m0leConCTF2021逆向Automatic Rejection Machine题解
+    </h1>
+  
+
+        
+        <a href="/2021/05/20/m0leConCTF2021%E9%80%86%E5%90%91Automatic-Rejection-Machine%E9%A2%98%E8%A7%A3/" class="archive-article-date">
+  	<time datetime="2021-05-20T14:39:58.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-05-20</time>
+</a>
+        
+      </header>
     
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>程序逻辑不难分析，但是我还是踩了坑</p>
+<h3 id="第一个坑"><a href="#第一个坑" class="headerlink" title="第一个坑"></a>第一个坑</h3><p>程序3个字符为一组进行加密，由于程序逻辑清晰，本来是决定用VS2017重构IDA的伪代码，然后进行爆破的，搞了一天没搞对，这是个很笨的方法，VS2017会报各种栈溢出的错，而且IDA的 c 伪代码是不可信的，以后不到万不得已不会再用这个方法了</p>
+<h3 id="第二个坑"><a href="#第二个坑" class="headerlink" title="第二个坑"></a>第二个坑</h3><p>我用Python复原代码，但是Python不像c语言那样有整数类型，导致代码重构的时候，总是要把数字与&amp;上一个 <code>0xffffffffffffffff</code> ，导致Python代码实际可读性很差，容易粗心大意犯错，下次我会采用c语言来复原代码了</p>
+<h3 id="第三个坑"><a href="#第三个坑" class="headerlink" title="第三个坑"></a>第三个坑</h3><p>环境搭建，我的调试是这样的，首先开启一个终端</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">qemu-aarch64 -g 1234  -L &#x2F;usr&#x2F;aarch64-linux-gnu .&#x2F;challenge</span><br></pre></td></tr></table></figure>
+<p>然后再开启一个终端</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gdb-multiarch .&#x2F;challenge -q</span><br></pre></td></tr></table></figure>
+<p>然后在gdb中远程连接1234端口</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">target  remote 127.0.0.1:1234</span><br></pre></td></tr></table></figure>
+<p>每次我想让程序重新开始，都要重复上述步骤，太烦了</p>
+<p>对此，我实在受不了这种重复的工作了，于是我写了个脚本自动化配环境</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/python3</span></span><br><span class="line"><span class="keyword">import</span> os</span><br><span class="line">path = <span class="string">&quot;../challenge&quot;</span></span><br><span class="line">port = <span class="number">2000</span></span><br><span class="line">breakpoints = []</span><br><span class="line"><span class="comment"># 1234567890abcdefghijklmnobqrstuv</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># ./env_script</span></span><br><span class="line">f = <span class="built_in">open</span>(<span class="string">&quot;./env_script&quot;</span>,<span class="string">&quot;w+&quot;</span>)</span><br><span class="line">content = <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">#!/bin/bash</span></span><br><span class="line"><span class="string">port=&#123;&#125;</span></span><br><span class="line"><span class="string">&quot;&quot;&quot;</span>.<span class="built_in">format</span>(port)</span><br><span class="line">content += <span class="string">r&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">state=`netstat  -anp  |grep  $port`</span></span><br><span class="line"><span class="string">echo $state</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">if [ -z $state]</span></span><br><span class="line"><span class="string">then</span></span><br><span class="line"><span class="string">	echo &quot;port is not used,success&quot;</span></span><br><span class="line"><span class="string">else</span></span><br><span class="line"><span class="string">	pid=`netstat  -anp  |grep  $port |awk &#x27;&#123;print $7&#125;&#x27;|awk -F &#x27;/&#x27; &#x27;&#123;print $1&#125;&#x27;`</span></span><br><span class="line"><span class="string">	kill -9 $pid</span></span><br><span class="line"><span class="string">fi</span></span><br><span class="line"><span class="string">&quot;&quot;&quot;</span></span><br><span class="line">content += <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">file_path=&quot;&#123;&#125;&quot;</span></span><br><span class="line"><span class="string">qemu-aarch64 -g $port -L /usr/aarch64-linux-gnu $file_path</span></span><br><span class="line"><span class="string">&quot;&quot;&quot;</span>.<span class="built_in">format</span>(path)</span><br><span class="line"><span class="comment"># print(content)</span></span><br><span class="line">f.write(content)</span><br><span class="line">f.close()</span><br><span class="line">os.system(<span class="string">&quot;chmod 777 ./env_script&quot;</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># ./debug_script</span></span><br><span class="line">f = <span class="built_in">open</span>(<span class="string">&quot;./debug_script&quot;</span>,<span class="string">&quot;w+&quot;</span>)</span><br><span class="line">content = <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">#!/bin/bash</span></span><br><span class="line"><span class="string">port=&#123;&#125;</span></span><br><span class="line"><span class="string">file_path=&quot;&#123;&#125;&quot;</span></span><br><span class="line"><span class="string">gdb-multiarch &quot;&#123;&#125;&quot; -q -x ./gdb_script</span></span><br><span class="line"><span class="string">&quot;&quot;&quot;</span>.<span class="built_in">format</span>(port,path,path)</span><br><span class="line"><span class="comment"># print(content)</span></span><br><span class="line">f.write(content)</span><br><span class="line">f.close()</span><br><span class="line">os.system(<span class="string">&quot;chmod 777 ./debug_script&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># ./gdb_script</span></span><br><span class="line">f = <span class="built_in">open</span>(<span class="string">&quot;./gdb_script&quot;</span>,<span class="string">&quot;w+&quot;</span>)</span><br><span class="line">content = <span class="string">&quot;target remote 127.0.0.1:&#123;&#125;&quot;</span>.<span class="built_in">format</span>(port)</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(breakpoints)):</span><br><span class="line">    content += <span class="string">&quot;\r\n&quot;</span></span><br><span class="line">    content += <span class="string">&quot;b *0x4000000000 + &quot;</span> + <span class="built_in">hex</span>(breakpoints[i]) </span><br><span class="line"><span class="comment"># print(content)</span></span><br><span class="line">f.write(content)</span><br><span class="line">f.close()</span><br><span class="line">os.system(<span class="string">&quot;chmod 777 ./gdb_script&quot;</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">os.system(<span class="string">&quot;gnome-terminal -e &#x27;bash -c \&quot;./env_script; exec bash\&quot;&#x27;&quot;</span>)</span><br><span class="line">os.system(<span class="string">&quot;./debug_script&quot;</span>)</span><br></pre></td></tr></table></figure>
+<p>这个脚本可以自动下断点，主要运用了 shell 脚本 + gdb 脚本，至此，调试就轻松多了</p>
+<h2 id="题解"><a href="#题解" class="headerlink" title="题解"></a>题解</h2><p>回归正题，调试比对恢复代码，最后爆破即可</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br></pre></td><td class="code"><pre><span class="line">table1 = [<span class="number">0x71</span>, <span class="number">0x77</span>, <span class="number">0x65</span>, <span class="number">0x72</span>, <span class="number">0x74</span>, <span class="number">0x79</span>, <span class="number">0x75</span>, <span class="number">0x69</span>, <span class="number">0x6f</span>, <span class="number">0x70</span>, <span class="number">0x61</span>, <span class="number">0x73</span>, <span class="number">0x64</span>, <span class="number">0x66</span>, <span class="number">0x67</span>, <span class="number">0x68</span>, <span class="number">0x6a</span>, <span class="number">0x6b</span>,</span><br><span class="line">          <span class="number">0x6c</span>, <span class="number">0x7a</span>, <span class="number">0x78</span>, <span class="number">0x63</span>, <span class="number">0x76</span>, <span class="number">0x62</span>, <span class="number">0x6e</span>, <span class="number">0x6d</span>, <span class="number">0x31</span>, <span class="number">0x32</span>, <span class="number">0x33</span>, <span class="number">0x34</span>, <span class="number">0x35</span>, <span class="number">0x36</span>]</span><br><span class="line">table2 = [<span class="number">0x71</span>, <span class="number">0x73</span>, <span class="number">0x77</span>, <span class="number">0x75</span>, <span class="number">0x74</span>, <span class="number">0x79</span>, <span class="number">0x72</span>, <span class="number">0x69</span>, <span class="number">0x6f</span>, <span class="number">0x70</span>, <span class="number">0x61</span>, <span class="number">0x65</span>, <span class="number">0x64</span>, <span class="number">0x76</span>, <span class="number">0x6e</span>, <span class="number">0x68</span>, <span class="number">0x6b</span>, <span class="number">0x6a</span>,</span><br><span class="line">          <span class="number">0x6c</span>, <span class="number">0x7a</span>, <span class="number">0x63</span>, <span class="number">0x62</span>, <span class="number">0x66</span>, <span class="number">0x78</span>, <span class="number">0x67</span>, <span class="number">0x34</span>, <span class="number">0x33</span>, <span class="number">0x32</span>, <span class="number">0x31</span>, <span class="number">0x6d</span>, <span class="number">0x35</span>, <span class="number">0x36</span>]</span><br><span class="line">table3 = []</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(table1)):</span><br><span class="line">    table3.append(table2.index(table1[i]))</span><br><span class="line">print(table3)</span><br><span class="line">s = [<span class="number">0</span> <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">60</span>)]</span><br><span class="line">s[<span class="number">0</span>] = <span class="number">0xB4D8846071AC9EE5</span></span><br><span class="line">s[<span class="number">1</span>] = <span class="number">0x1E1FF00814E134FE</span></span><br><span class="line">s[<span class="number">2</span>] = <span class="number">0x6B198E7941B7002E</span></span><br><span class="line">s[<span class="number">3</span>] = <span class="number">0xBC6FA839EFE36443</span></span><br><span class="line">s[<span class="number">4</span>] = <span class="number">0xC3C71AD9A664B6C3</span></span><br><span class="line">s[<span class="number">5</span>] = <span class="number">0x5692A2F09C98D986</span></span><br><span class="line">s[<span class="number">6</span>] = <span class="number">0xF084A1A59CD01E68</span></span><br><span class="line">s[<span class="number">7</span>] = <span class="number">0xBC52E78A7E4DF2DF</span></span><br><span class="line">s[<span class="number">8</span>] = <span class="number">0xDA219D93290B91A8</span></span><br><span class="line">s[<span class="number">9</span>] = <span class="number">0x5703D0286FA5D32F</span></span><br><span class="line">s[<span class="number">10</span>] = <span class="number">0x6274B1B118DA82B2</span></span><br><span class="line">s[<span class="number">11</span>] = <span class="number">0xA746EBFB0954EBBC</span></span><br><span class="line">s[<span class="number">12</span>] = <span class="number">0x5F6DF7BD4F1967A2</span></span><br><span class="line">s[<span class="number">13</span>] = <span class="number">0x16D5B5BDEE98CF8E</span></span><br><span class="line">s[<span class="number">14</span>] = <span class="number">0x52E8B6DF7E62E39A</span></span><br><span class="line">s[<span class="number">15</span>] = <span class="number">0x99F9455FB0C8D933</span></span><br><span class="line">s[<span class="number">16</span>] = <span class="number">0x5FFD82D53AF933D</span></span><br><span class="line">s[<span class="number">17</span>] = <span class="number">0xFF9084A16FF0141C</span></span><br><span class="line">s[<span class="number">18</span>] = <span class="number">0xE17C5F0781D52F9B</span></span><br><span class="line">s[<span class="number">19</span>] = <span class="number">0x1A0F4431548E51D1</span></span><br><span class="line">s[<span class="number">20</span>] = <span class="number">0xF2E8573D8F0F01DD</span></span><br><span class="line">s[<span class="number">21</span>] = <span class="number">0x250039177F4DEF91</span></span><br><span class="line">s[<span class="number">22</span>] = <span class="number">0x8851491ECBC7AF7C</span></span><br><span class="line">s[<span class="number">23</span>] = <span class="number">0xAD427C6695B91D24</span></span><br><span class="line">s[<span class="number">24</span>] = <span class="number">0x5E0071D97D98D094</span></span><br><span class="line">s[<span class="number">25</span>] = <span class="number">0x264DDA52B0C37B03</span></span><br><span class="line">s[<span class="number">26</span>] = <span class="number">0xA5811271D6D7C428</span></span><br><span class="line">s[<span class="number">27</span>] = <span class="number">0xE0133FC719F34136</span></span><br><span class="line">s[<span class="number">28</span>] = <span class="number">0xE508ACE2412B2633</span></span><br><span class="line">s[<span class="number">29</span>] = <span class="number">0x74321A3E9FACE34C</span></span><br><span class="line">s[<span class="number">30</span>] = <span class="number">0xFF5B8A59E8EBF70B</span></span><br><span class="line">s[<span class="number">31</span>] = <span class="number">0x76275A516F88C986</span></span><br><span class="line">s[<span class="number">32</span>] = <span class="number">0x1604D76F74599CC4</span></span><br><span class="line">s[<span class="number">33</span>] = <span class="number">0xF744BCD8F2016F58</span></span><br><span class="line">s[<span class="number">34</span>] = <span class="number">0xA0B6A7A0239E4EA7</span></span><br><span class="line">s[<span class="number">35</span>] = <span class="number">0xF1EFC57F15CB9AB4</span></span><br><span class="line">s[<span class="number">36</span>] = <span class="number">0xB0D1AD4FB4ED946A</span></span><br><span class="line">s[<span class="number">37</span>] = <span class="number">0x81CA31324D48E689</span></span><br><span class="line">s[<span class="number">38</span>] = <span class="number">0xE6A9979C51869F49</span></span><br><span class="line">s[<span class="number">39</span>] = <span class="number">0xA666637EE4BC2457</span></span><br><span class="line">s[<span class="number">40</span>] = <span class="number">0x6475B6AB4884B93C</span></span><br><span class="line">s[<span class="number">41</span>] = <span class="number">0x5C033B1207DA898F</span></span><br><span class="line">s[<span class="number">42</span>] = <span class="number">0xB66DC7E0DEC3443E</span></span><br><span class="line">s[<span class="number">43</span>] = <span class="number">0xE4899C99CFA0235C</span></span><br><span class="line">s[<span class="number">44</span>] = <span class="number">0x3B7FD8D4D0DCAF6B</span></span><br><span class="line">s[<span class="number">45</span>] = <span class="number">0xB1A4690DB34A7A7C</span></span><br><span class="line">s[<span class="number">46</span>] = <span class="number">0x8041D2607129ADAB</span></span><br><span class="line">s[<span class="number">47</span>] = <span class="number">0xA6A1294A99894F1A</span></span><br><span class="line">s[<span class="number">48</span>] = <span class="number">0xDDE37A1C4524B831</span></span><br><span class="line">s[<span class="number">49</span>] = <span class="number">0x3BC8D81DE355B65C</span></span><br><span class="line">s[<span class="number">50</span>] = <span class="number">0x6C61AB15A63AD91E</span></span><br><span class="line">s[<span class="number">51</span>] = <span class="number">0x8FA4E37F4A3C7A39</span></span><br><span class="line">s[<span class="number">52</span>] = <span class="number">0x268B598404E773AF</span></span><br><span class="line">s[<span class="number">53</span>] = <span class="number">0x74F4F040AE13F867</span></span><br><span class="line">s[<span class="number">54</span>] = <span class="number">0x4DF78E91FD682404</span></span><br><span class="line">s[<span class="number">55</span>] = <span class="number">0xABE1FC425A9A671A</span></span><br><span class="line">s[<span class="number">56</span>] = <span class="number">0x1BB06615C8A31DD5</span></span><br><span class="line">s[<span class="number">57</span>] = <span class="number">0x9F56E9AEF2FA5D55</span></span><br><span class="line">s[<span class="number">58</span>] = <span class="number">0x239DCF030B3CE09B</span></span><br><span class="line">s[<span class="number">59</span>] = <span class="number">0x24556A34B61CA998</span></span><br><span class="line">x = <span class="built_in">list</span>(<span class="built_in">map</span>(<span class="built_in">ord</span>, <span class="string">&quot;1234567890abcdefghijklmnobqrstuv&quot;</span>))</span><br><span class="line">y = [<span class="number">0</span> <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(x))]</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(x)):</span><br><span class="line">    y[table3[i]] = x[i]</span><br><span class="line">print(<span class="built_in">bytes</span>(y))</span><br><span class="line"></span><br><span class="line">y.append(y[<span class="number">0</span>])</span><br><span class="line">y.append(y[<span class="number">1</span>])</span><br><span class="line"><span class="comment"># 0x3c51f518c2cc9791</span></span><br><span class="line"><span class="comment"># 1b27564890a3cmofhgijlndketsrqbuv</span></span><br><span class="line"><span class="comment"># 1b27564890a3cmofhgijlndketsrqbuv</span></span><br><span class="line">v1 = [<span class="number">0</span> <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">2</span>)]</span><br><span class="line">v2 = [<span class="number">0</span> <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">4</span>)]</span><br><span class="line">v1[<span class="number">0</span>] = <span class="number">0x9E3779B917181920</span></span><br><span class="line">v1[<span class="number">1</span>] = <span class="number">0x9E3779B912881288</span></span><br><span class="line">v2[<span class="number">0</span>] = <span class="number">0xDEADBEEFFEEDBEEF</span></span><br><span class="line">v2[<span class="number">1</span>] = <span class="number">0x1BADB002FACECAFE</span></span><br><span class="line">v2[<span class="number">2</span>] = <span class="number">0xFEEDFACE08920892</span></span><br><span class="line">v2[<span class="number">3</span>] = <span class="number">0xCAFEFEED12401240</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">func</span>(<span class="params">v1, v2,y</span>):</span></span><br><span class="line">    v1[<span class="number">0</span>] = (y[<span class="number">2</span>] &lt;&lt; <span class="number">16</span>) | (y[<span class="number">1</span>] &lt;&lt; <span class="number">8</span>) | y[<span class="number">0</span>] | <span class="number">0xAABBCCDD11000000</span></span><br><span class="line">    <span class="comment"># print(hex(num1))</span></span><br><span class="line">    v1_c = v1.copy()</span><br><span class="line">    v2_c = v2.copy()</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">0x10</span>):</span><br><span class="line">        v3 = i &amp; <span class="number">3</span></span><br><span class="line">        v2_c[v3] = ((v2_c[<span class="number">0</span>] + v2_c[<span class="number">1</span>]) &amp; <span class="number">0xffffffffffffffff</span>) + (</span><br><span class="line">                ((v2_c[<span class="number">2</span>] + v2_c[<span class="number">3</span>]) &amp; <span class="number">0xffffffffffffffff</span>) ^ (v2_c[<span class="number">0</span>] &lt;&lt; (v2_c[<span class="number">2</span>] % <span class="number">64</span>)) &amp; <span class="number">0xffffffffffffffff</span>)</span><br><span class="line">        v2_c[v3] &amp;= <span class="number">0xffffffffffffffff</span></span><br><span class="line">        v1_c[<span class="number">0</span>] += ((((v2_c[v3] + v1_c[<span class="number">1</span>]) &lt;&lt; <span class="number">9</span>) &amp; <span class="number">0xffffffffffffffff</span>) ^ (</span><br><span class="line">                (v2_c[v3] - v1_c[<span class="number">1</span>]) &amp; <span class="number">0xffffffffffffffff</span>) ^ (</span><br><span class="line">                            ((v2_c[v3] + v1_c[<span class="number">1</span>]) &amp; <span class="number">0xffffffffffffffff</span>) &gt;&gt; <span class="number">14</span>)) &amp; <span class="number">0xffffffffffffffff</span></span><br><span class="line">        v1_c[<span class="number">0</span>] &amp;= <span class="number">0xffffffffffffffff</span></span><br><span class="line">        v1_c[<span class="number">1</span>] += ((((v2_c[v3] + v1_c[<span class="number">0</span>]) &lt;&lt; <span class="number">9</span>) &amp; <span class="number">0xffffffffffffffff</span>) ^ (</span><br><span class="line">                (v2_c[v3] - v1_c[<span class="number">0</span>]) &amp; <span class="number">0xffffffffffffffff</span>) ^ (</span><br><span class="line">                            ((v2_c[v3] + v1_c[<span class="number">0</span>]) &amp; <span class="number">0xffffffffffffffff</span>) &gt;&gt; <span class="number">14</span>)) &amp; <span class="number">0xffffffffffffffff</span></span><br><span class="line">        v1_c[<span class="number">1</span>] &amp;= <span class="number">0xffffffffffffffff</span></span><br><span class="line">    <span class="keyword">return</span> v1_c[<span class="number">0</span>], v1_c[<span class="number">1</span>]</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">brute</span>():</span></span><br><span class="line">    y = [<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>]</span><br><span class="line">    <span class="keyword">for</span> b1 <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">32</span>, <span class="number">0x7f</span>):</span><br><span class="line">        <span class="keyword">for</span> b2 <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">32</span>, <span class="number">0x7f</span>):</span><br><span class="line">            <span class="keyword">for</span> b3 <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">32</span>, <span class="number">0x7f</span>):</span><br><span class="line">                y[<span class="number">0</span>] = b1</span><br><span class="line">                y[<span class="number">1</span>] = b2</span><br><span class="line">                y[<span class="number">2</span>] = b3</span><br><span class="line">                r1,r2 = func(v1.copy(), v2.copy(), y)</span><br><span class="line">                <span class="keyword">if</span> r1 == s[<span class="number">0</span>] <span class="keyword">and</span> r2 ==s[<span class="number">1</span>]:</span><br><span class="line">                    print(b1,b2,b3)</span><br><span class="line"></span><br><span class="line"><span class="comment"># brute()</span></span><br><span class="line"><span class="comment"># 112 117 116</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">brute2</span>():</span></span><br><span class="line">    y = [<span class="number">0</span> <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">32</span>)]</span><br><span class="line">    y[<span class="number">0</span>] = <span class="number">112</span></span><br><span class="line">    y[<span class="number">1</span>] = <span class="number">117</span></span><br><span class="line">    y[<span class="number">2</span>] = <span class="number">116</span></span><br><span class="line">    y[<span class="number">30</span>] = y[<span class="number">0</span>]</span><br><span class="line">    y[<span class="number">31</span>] = y[<span class="number">1</span>]</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">1</span>,<span class="number">30</span>):</span><br><span class="line">        <span class="keyword">for</span> b <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">32</span>, <span class="number">0x7f</span>):</span><br><span class="line">            y[i+<span class="number">2</span>] = b</span><br><span class="line">            r1, r2 = func(v1.copy(), v2.copy(), y[i:i+<span class="number">3</span>])</span><br><span class="line">            <span class="keyword">if</span> r1 == s[<span class="number">2</span>*i+<span class="number">0</span>] <span class="keyword">and</span> r2 == s[<span class="number">2</span>*i+<span class="number">1</span>]:</span><br><span class="line">                func(v1, v2, y[i:i+<span class="number">3</span>])</span><br><span class="line">                <span class="keyword">break</span></span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">bytes</span>(y)</span><br><span class="line">flag = brute2().decode()</span><br><span class="line"></span><br><span class="line">ans = <span class="string">&quot;&quot;</span></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(flag)):</span><br><span class="line">    ans += flag[table3[i]]</span><br><span class="line">print(ans)</span><br><span class="line"></span><br><span class="line"><span class="comment"># ptm&#123;5m0l_chunk5_5m0l_53cur17y&#125;pu</span></span><br></pre></td></tr></table></figure>
+<p>总结一下爆破的步骤吧</p>
+<ol>
+<li>恢复代码，定义为函数func，返回要比对的值</li>
+<li>开始爆破，for循环嵌套，之后赋值，赋值后调用func，<strong>参数都是副本</strong></li>
+<li>比对结果，结果正确就记录，<strong>并且把真正参数传入func进行一次迭代</strong>，看情况退出</li>
+</ol>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
       
       
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2021" class="archive-year">2021</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2021/03/18/%E5%AE%89%E5%8D%93%E9%80%86%E5%90%91checklist/" class="archive-article-date">
-  	<time datetime="2021-03-19T05:23:59.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-03-18</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2021/03/18/%E5%AE%89%E5%8D%93%E9%80%86%E5%90%91checklist/">安卓逆向checklist</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2021/03/17/vnctf2021-FilpGame/" class="archive-article-date">
-  	<time datetime="2021-03-17T10:25:37.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-03-17</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2021/03/17/vnctf2021-FilpGame/">vnctf2021-FilpGame</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2021/01/30/ELF%E5%87%BD%E6%95%B0%E5%88%A9%E7%94%A8/" class="archive-article-date">
-  	<time datetime="2021-01-31T04:52:04.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-01-30</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2021/01/30/ELF%E5%87%BD%E6%95%B0%E5%88%A9%E7%94%A8/">ELF函数利用</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">reverse ctf</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">aarch64</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">reverse</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">爆破</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">gdbScript</a>
         		</li>
       		
 		</ul>
 	</div>
 
-          
+      
 
+      
+
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
         </div>
-        <div class="clearfix"></div>
-    </header>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//pan.baidu.com/share/qrcode?url=http://example.com/2021/05/20/m0leConCTF2021%E9%80%86%E5%90%91Automatic-Rejection-Machine%E9%A2%98%E8%A7%A3/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
+
   
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2021/01/29/Linux-Ubuntu%E6%90%AD%E5%BB%BAHexo%E5%8D%9A%E5%AE%A2/" class="archive-article-date">
-  	<time datetime="2021-01-30T04:52:04.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-01-29</time>
-</a>
+<nav id="article-nav">
+  
+  
+    <a href="/2021/05/19/ARM-aarch64-PWN%E5%85%A5%E9%97%A8/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">ARM-aarch64-PWN入门</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
         </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2021/01/29/Linux-Ubuntu%E6%90%AD%E5%BB%BAHexo%E5%8D%9A%E5%AE%A2/">Linux-Ubuntu搭建Hexo博客</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-          
-
+        
+        
+        <div class="toc-container tooltip-left">
+            <i class="icon-font icon-category"></i>
+            <div class="tooltip tooltip-east">
+                <span class="tooltip-item">
+                </span>
+                <span class="tooltip-content">
+                    <div class="toc-article">
+                    <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AC%AC%E4%B8%80%E4%B8%AA%E5%9D%91"><span class="toc-number">1.</span> <span class="toc-text">第一个坑</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AC%AC%E4%BA%8C%E4%B8%AA%E5%9D%91"><span class="toc-number">2.</span> <span class="toc-text">第二个坑</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AC%AC%E4%B8%89%E4%B8%AA%E5%9D%91"><span class="toc-number">3.</span> <span class="toc-text">第三个坑</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%A2%98%E8%A7%A3"><span class="toc-number"></span> <span class="toc-text">题解</span></a>
+                    </div>
+                </span>
+            </div>
         </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
+        
+    </div>
+</aside>
+
+
+
   
   
-    </div></section>
   
 
-    
-    <nav id="page-nav">
-      <a class="extend prev" rel="prev" href="/archives/2021/">&amp;laquo; Prev</a><a class="page-number" href="/archives/2021/">1</a><span class="page-number current">2</span>
-    </nav>
+  
+
+  
+
   
 
 
@@ -311,8 +365,8 @@
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: false,
-		isArchive: true,
+		isPost: true,
+		isArchive: false,
 		isTag: false,
 		isCategory: false,
 		open_in_new: false,
