@@ -6,15 +6,23 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://example.com">
-  <title>Tag: vm | Hexo</title>
+  <title>OMH_2021_CTF flagsaver | Hexo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="Hexo">
-<meta property="og:url" content="http://example.com/tags/vm/index.html">
+  <meta name="description" content="windows注册表https:&#x2F;&#x2F;www.cnblogs.com&#x2F;Mikasa-Ackerman&#x2F;p&#x2F;Windows-zhu-ce-biao-de-xue-xi.html Windows注册表是一个存放各种配置信息、参数的数据库，直接控制系统启动和硬件的转载和Windows程序的运行 既然是数据库那少不了增删改查，可以通过cmd命令实现，当然，也可以通过编程 注册表5个根键  HKEY_CLAS">
+<meta property="og:type" content="article">
+<meta property="og:title" content="OMH_2021_CTF flagsaver">
+<meta property="og:url" content="http://example.com/2021/05/23/OMH-2021-CTF-flagsaver/index.html">
 <meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="windows注册表https:&#x2F;&#x2F;www.cnblogs.com&#x2F;Mikasa-Ackerman&#x2F;p&#x2F;Windows-zhu-ce-biao-de-xue-xi.html Windows注册表是一个存放各种配置信息、参数的数据库，直接控制系统启动和硬件的转载和Windows程序的运行 既然是数据库那少不了增删改查，可以通过cmd命令实现，当然，也可以通过编程 注册表5个根键  HKEY_CLAS">
 <meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://raw.githubusercontent.com/m0v1ng/images/master/2021-05/20210523004931.png">
+<meta property="article:published_time" content="2021-05-24T04:48:32.000Z">
+<meta property="article:modified_time" content="2021-05-24T04:49:36.519Z">
 <meta property="article:author" content="John Doe">
+<meta property="article:tag" content="reverse">
+<meta property="article:tag" content="c#">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/m0v1ng/images/master/2021-05/20210523004931.png">
   
     <link rel="alternative" href="/atom.xml" title="Hexo" type="application/atom+xml">
   
@@ -150,36 +158,76 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
-  
-  
+            <article id="post-OMH-2021-CTF-flagsaver" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
     
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2021" class="archive-year">2021</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2021/05/22/CISCN-2021-little-evil/" class="archive-article-date">
-  	<time datetime="2021-05-22T12:31:24.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-05-22</time>
-</a>
-        </div>
-    	 
+      <header class="article-header">
+        
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2021/05/22/CISCN-2021-little-evil/">CISCN 2021 little_evil</a>
+    <h1 class="article-title" itemprop="name">
+      OMH_2021_CTF flagsaver
     </h1>
   
 
-        <div class="article-info info-on-right">
-          
+        
+        <a href="/2021/05/23/OMH-2021-CTF-flagsaver/" class="archive-article-date">
+  	<time datetime="2021-05-24T04:48:32.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-05-23</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="windows注册表"><a href="#windows注册表" class="headerlink" title="windows注册表"></a>windows注册表</h2><p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/Mikasa-Ackerman/p/Windows-zhu-ce-biao-de-xue-xi.html">https://www.cnblogs.com/Mikasa-Ackerman/p/Windows-zhu-ce-biao-de-xue-xi.html</a></p>
+<p>Windows注册表是一个存放各种配置信息、参数的<strong>数据库</strong>，直接控制系统启动和硬件的转载和Windows程序的运行</p>
+<p>既然是数据库那少不了<strong>增删改查</strong>，可以通过cmd命令实现，当然，也可以通过编程</p>
+<p>注册表5个根键</p>
+<ul>
+<li>HKEY_CLASSES_ROOT，该根键包括启动应用程序所需的全部信息,包括扩展名,应用程序与文档之间的关系 驱动程序名,DDE和OLE信息,类ID,编号和应用程序与文档的图标等.</li>
+<li>HKEY_CURRENT_USER，该根键包括当前登录用户的配置信息,包括环境变量,个人程序以及桌面设置等</li>
+<li>HKEY_LOCAL_MACHINE，该根键包括本地计算机的系统信息,包括硬件和操作系统信息。 安全数据和计算机专用的各类软件设置信息</li>
+<li>HKEY_USERS，该根键包括计算机的所有用户使用的配置数据</li>
+<li>HKEY_CURRENT_CONFIG，该根键包括当前硬件的配置信息,其中的信息是从HKEY_LOCAL_MACHINE中映射出来的</li>
+</ul>
+<h2 id="c-RegistryKey"><a href="#c-RegistryKey" class="headerlink" title="c# RegistryKey"></a>c# RegistryKey</h2><p><a target="_blank" rel="noopener" href="https://www.open-open.com/code/view/1455966915480">https://www.open-open.com/code/view/1455966915480</a></p>
+<blockquote>
+<p>要访问注册表，可以使用Microsoft.Win32命名空间中的两个类Registry 和RegistryKey。RegistryKey实例表示一个注册表项，这个类的方法可以浏览子键、创建新键、读取或修改键中的值。换言之，该类可以完成对注册表项进行的所有操作(除了设置键的安全级别之外)</p>
+</blockquote>
+<p>程序传入参数<code>/c</code> 会启动类 SettingForm窗口</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">if (text &#x3D;&#x3D; &quot;&#x2F;c&quot;)</span><br><span class="line">&#123;</span><br><span class="line">	Application.Run(new SettingsForm());</span><br><span class="line">	return;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>要输入的值会被写到 注册表项 CurrentUser的SOFTWARE\FlagSaver\text</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">private void SaveSettings()</span><br><span class="line">&#123;</span><br><span class="line">	Registry.CurrentUser.CreateSubKey(&quot;SOFTWARE\\FlagSaver&quot;).SetValue(&quot;text&quot;, this.textBox.Text);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>理解一下text含义：number of piece，screenshot的块数？</p>
+<p>程序传入参数<code>/p</code> 会启动类 ScreenSaverForm</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">if (text &#x3D;&#x3D; &quot;&#x2F;p&quot;)</span><br><span class="line">&#123;</span><br><span class="line">	if (text2 &#x3D;&#x3D; null)</span><br><span class="line">	&#123;</span><br><span class="line">		MessageBox.Show(&quot;Missing handle!&quot;, &quot;FlagSaver&quot;, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);</span><br><span class="line">		return;</span><br><span class="line">	&#125;</span><br><span class="line">	Application.Run(new ScreenSaverForm(new IntPtr(long.Parse(text2))));</span><br><span class="line">	</span><br></pre></td></tr></table></figure>
+<p>类 ScreenSaverForm的 LoadSetting函数把注册表项 CurrentUser的SOFTWARE\FlagSaver\text的值读出来放到this.pieces</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">private void LoadSettings()</span><br><span class="line">&#123;</span><br><span class="line">	RegistryKey registryKey &#x3D; Registry.CurrentUser.OpenSubKey(&quot;SOFTWARE\\FlagSaver&quot;);</span><br><span class="line">	if (registryKey !&#x3D; null)</span><br><span class="line">	&#123;</span><br><span class="line">		this.pieces &#x3D; int.Parse((string)registryKey.GetValue(&quot;text&quot;));</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="c-Timer-bounds"><a href="#c-Timer-bounds" class="headerlink" title="c# Timer bounds"></a>c# Timer bounds</h2><p>timer是C#的计时器组件，bounds是屏幕边界的意思，这里有个C#项目，学习一下就基本了解前二者了。<a target="_blank" rel="noopener" href="https://blog.csdn.net/yongh701/article/details/50131707">https://blog.csdn.net/yongh701/article/details/50131707</a></p>
+<p>ScreenSaverForm构造函数，由此可知传入的是参数是一个Rectangle表示要截屏幕的范围</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">public ScreenSaverForm(Rectangle Bounds)</span><br><span class="line">&#123;</span><br><span class="line">	this.InitializeComponent();</span><br><span class="line">	base.Bounds &#x3D; Bounds;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="c-Screen类-Graphics类"><a href="#c-Screen类-Graphics类" class="headerlink" title="c# Screen类 Graphics类"></a>c# Screen类 Graphics类</h2><p>Screen类：<a target="_blank" rel="noopener" href="https://blog.csdn.net/liuxiaomao1988/article/details/87435529">https://blog.csdn.net/liuxiaomao1988/article/details/87435529</a></p>
+<p>Graphics类：<a target="_blank" rel="noopener" href="https://blog.csdn.net/freelmm/article/details/88832510">https://blog.csdn.net/freelmm/article/details/88832510</a></p>
+<p> ScreenSaverForm：TakeScreenShot：截取当前屏幕作为Graphics实例</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F; ScreenSaver.ScreenSaverForm</span><br><span class="line">&#x2F;&#x2F; Token: 0x06000018 RID: 24 RVA: 0x000028E8 File Offset: 0x00000AE8</span><br><span class="line">private Bitmap TakeScreenShot()</span><br><span class="line">&#123;</span><br><span class="line">	Bitmap bitmap &#x3D; new Bitmap(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height);</span><br><span class="line">	Bitmap result;</span><br><span class="line">	using (Graphics graphics &#x3D; Graphics.FromImage(bitmap))</span><br><span class="line">	&#123;</span><br><span class="line">		graphics.CopyFromScreen(0, 0, 0, 0, Screen.PrimaryScreen.Bounds.Size);</span><br><span class="line">		result &#x3D; bitmap;</span><br><span class="line">	&#125;</span><br><span class="line">	return result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="LCG"><a href="#LCG" class="headerlink" title="LCG"></a>LCG</h2><p>线性同余生成器，主要逻辑就这个了</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">public long NextValue()</span><br><span class="line">&#123;</span><br><span class="line">	this.seed &#x3D; (this.a * this.seed + this.c) % this.modulus;</span><br><span class="line">	return this.seed;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在 ShuffleArray时使用</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F; ScreenSaver.ScreenSaverForm</span><br><span class="line">&#x2F;&#x2F; Token: 0x06000013 RID: 19 RVA: 0x000027B0 File Offset: 0x000009B0</span><br><span class="line">private Image[] ShuffleArray(Image[] imgarray)</span><br><span class="line">&#123;</span><br><span class="line">	int num &#x3D; this.pieces * this.pieces;</span><br><span class="line">	LCG lcg &#x3D; new LCG(this.lcg.NextValue(), 65537L);</span><br><span class="line">	for (int i &#x3D; 0; i &lt; this.pieces; i++)</span><br><span class="line">	&#123;</span><br><span class="line">		for (int j &#x3D; 0; j &lt; this.pieces; j++)</span><br><span class="line">		&#123;</span><br><span class="line">			long num2 &#x3D; lcg.NextValue() % (long)num;</span><br><span class="line">			long num3 &#x3D; lcg.NextValue() % (long)num;</span><br><span class="line">			checked</span><br><span class="line">			&#123;</span><br><span class="line">				Image image &#x3D; imgarray[(int)((IntPtr)num2)];</span><br><span class="line">				imgarray[(int)((IntPtr)num2)] &#x3D; imgarray[(int)((IntPtr)num3)];</span><br><span class="line">				imgarray[(int)((IntPtr)num3)] &#x3D; image;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	return imgarray;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>用当前lcg的下一个数当种子，生成两个随机数对 num 取余，作为index在array中取值，交换这个两个值的位置，执行num次</p>
+<h2 id="MoveTimer-Tick"><a href="#MoveTimer-Tick" class="headerlink" title="MoveTimer_Tick"></a>MoveTimer_Tick</h2><p>定时器，每隔一段时间会执行一次</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F; ScreenSaver.ScreenSaverForm</span><br><span class="line">&#x2F;&#x2F; Token: 0x06000012 RID: 18 RVA: 0x00002678 File Offset: 0x00000878</span><br><span class="line">private void MoveTimer_Tick(object sender, EventArgs e)</span><br><span class="line">&#123;</span><br><span class="line">	this.jigsaw &#x3D; new Bitmap(this.screenCapture);</span><br><span class="line">	int num &#x3D; base.Width &#x2F; this.pieces;</span><br><span class="line">	int num2 &#x3D; base.Height &#x2F; this.pieces;</span><br><span class="line">	Image[] array &#x3D; new Image[this.pieces * this.pieces];</span><br><span class="line">	for (int i &#x3D; 0; i &lt; this.pieces; i++)</span><br><span class="line">	&#123;</span><br><span class="line">		for (int j &#x3D; 0; j &lt; this.pieces; j++)</span><br><span class="line">		&#123;</span><br><span class="line">			int num3 &#x3D; i * this.pieces + j;</span><br><span class="line">			array[num3] &#x3D; new Bitmap(num, num2);</span><br><span class="line">			Graphics graphics &#x3D; Graphics.FromImage(array[num3]);</span><br><span class="line">			graphics.DrawImage(this.screenCapture, new Rectangle(0, 0, num, num2), new Rectangle(i * num, j * num2, num, num2), GraphicsUnit.Pixel);</span><br><span class="line">			graphics.Dispose();</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	array &#x3D; this.ShuffleArray(array);</span><br><span class="line">	Graphics graphics2 &#x3D; Graphics.FromImage(this.jigsaw);</span><br><span class="line">	for (int k &#x3D; 0; k &lt; this.pieces; k++)</span><br><span class="line">	&#123;</span><br><span class="line">		for (int l &#x3D; 0; l &lt; this.pieces; l++)</span><br><span class="line">		&#123;</span><br><span class="line">			int num4 &#x3D; k * this.pieces + l;</span><br><span class="line">			graphics2.DrawImage(array[num4], k * num, l * num2);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	graphics2.Dispose();</span><br><span class="line">	this.imageControl.Image &#x3D; this.jigsaw;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>this.screenCapture永远不变，变的只有 array </p>
+<p>写脚本恢复（不知道为什么恢复不完全，但是可以猜到flag）</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> PIL <span class="keyword">import</span> Image</span><br><span class="line">img = Image.<span class="built_in">open</span>(<span class="string">r&quot;D:\0Study3\OMH_2021_CTF\0afa401129bd7379e8795431723e42f4eab6ed71bedc1ec2a3647ee2273869bf_flagsaver\flagsaver\for_players\screenshot.png&quot;</span>)</span><br><span class="line">print(img.width,img.height)</span><br><span class="line">x,y,z = img.getpixel((<span class="number">0</span>,<span class="number">0</span>))</span><br><span class="line">print(x,y,z)</span><br><span class="line">print(img.getpixel((<span class="number">0</span>,<span class="number">0</span>)))</span><br><span class="line">piece = <span class="number">120</span></span><br><span class="line">width = <span class="number">1920</span>//<span class="number">120</span></span><br><span class="line">height = <span class="number">1080</span>//<span class="number">120</span></span><br><span class="line">imgarray_init = [img.crop((x, y, x+piece, y+piece)) <span class="keyword">for</span> x <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">0</span>, img.size[<span class="number">0</span>], width) <span class="keyword">for</span> y <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">0</span>, img.size[<span class="number">1</span>], height)]</span><br><span class="line"></span><br><span class="line">seed = <span class="number">51966</span></span><br><span class="line"><span class="comment"># seed =  (57005 * seed + 48879) % 128</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">lcg</span>():</span></span><br><span class="line">    <span class="keyword">global</span> seed</span><br><span class="line">    seed =  (<span class="number">57005</span> * seed + <span class="number">48879</span>) % <span class="number">65537</span></span><br><span class="line">    <span class="keyword">return</span> seed</span><br><span class="line"></span><br><span class="line">array = []</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(piece):</span><br><span class="line">    <span class="keyword">for</span> j <span class="keyword">in</span> <span class="built_in">range</span>(piece):</span><br><span class="line">        array.append((i,j))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">num = piece*piece</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">shuffle</span>():</span></span><br><span class="line">    list1 = []</span><br><span class="line">    list2 = []</span><br><span class="line">    lcg()</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(piece):</span><br><span class="line">        <span class="keyword">for</span> j <span class="keyword">in</span> <span class="built_in">range</span>(piece):</span><br><span class="line">            num2 = lcg() % num</span><br><span class="line">            num3 = lcg() % num</span><br><span class="line">            list1.append(num2)</span><br><span class="line">            list2.append(num3)</span><br><span class="line">    <span class="keyword">return</span> list1,list2</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">recover</span>(<span class="params">list1,list2,n</span>):</span></span><br><span class="line">    <span class="keyword">if</span> n==<span class="number">1</span>:</span><br><span class="line">        print(list1)</span><br><span class="line">    imgarray = imgarray_init.copy()</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(list1)-<span class="number">1</span>,-<span class="number">1</span>,-<span class="number">1</span>):</span><br><span class="line">        imgarray[list1[i]],imgarray[list2[i]] = imgarray[list2[i]],imgarray[list1[i]]</span><br><span class="line">    im = Image.new(<span class="string">&quot;RGB&quot;</span>, (<span class="number">1920</span>, <span class="number">1080</span>))</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(imgarray)):</span><br><span class="line">        im.paste(imgarray[i],((i // piece) * width, (i % piece) * height))</span><br><span class="line">    im.save(<span class="string">r&quot;D:\0Study3\OMH_2021_CTF\0afa401129bd7379e8795431723e42f4eab6ed71bedc1ec2a3647ee2273869bf_flagsaver\flagsaver\for_players\result\result_&#123;&#125;.png&quot;</span>.<span class="built_in">format</span>(n))</span><br><span class="line"><span class="comment"># print(array)</span></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">10</span>):</span><br><span class="line">    list1,list2 = shuffle()</span><br><span class="line">    recover(list1,list2,i)</span><br><span class="line"></span><br><span class="line"><span class="comment"># print(im.width,im.height)</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># im.show()</span></span><br></pre></td></tr></table></figure>
+<p><img src="https://raw.githubusercontent.com/m0v1ng/images/master/2021-05/20210523004931.png"></p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
@@ -189,29 +237,125 @@
         		</li>
       		 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">ruby</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">vm</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">c#</a>
         		</li>
       		
 		</ul>
 	</div>
 
-          
+      
 
+      
+
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
         </div>
-        <div class="clearfix"></div>
-    </header>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//pan.baidu.com/share/qrcode?url=http://example.com/2021/05/23/OMH-2021-CTF-flagsaver/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
+
+  
+<nav id="article-nav">
   
   
-    </div></section>
+    <a href="/2021/05/23/MTCTF2021-100mazes/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">MTCTF2021-100mazes</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+        <div class="toc-container tooltip-left">
+            <i class="icon-font icon-category"></i>
+            <div class="tooltip tooltip-east">
+                <span class="tooltip-item">
+                </span>
+                <span class="tooltip-content">
+                    <div class="toc-article">
+                    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#windows%E6%B3%A8%E5%86%8C%E8%A1%A8"><span class="toc-number">1.</span> <span class="toc-text">windows注册表</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#c-RegistryKey"><span class="toc-number">2.</span> <span class="toc-text">c# RegistryKey</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#c-Timer-bounds"><span class="toc-number">3.</span> <span class="toc-text">c# Timer bounds</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#c-Screen%E7%B1%BB-Graphics%E7%B1%BB"><span class="toc-number">4.</span> <span class="toc-text">c# Screen类 Graphics类</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#LCG"><span class="toc-number">5.</span> <span class="toc-text">LCG</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#MoveTimer-Tick"><span class="toc-number">6.</span> <span class="toc-text">MoveTimer_Tick</span></a></li></ol>
+                    </div>
+                </span>
+            </div>
+        </div>
+        
+    </div>
+</aside>
+
+
+
+  
+  
   
 
-    
+  
+
+  
+
+  
 
 
           </div>
@@ -234,9 +378,9 @@
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: false,
+		isPost: true,
 		isArchive: false,
-		isTag: true,
+		isTag: false,
 		isCategory: false,
 		open_in_new: false,
 		toc_hide_index: true,
