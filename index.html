@@ -152,6 +152,121 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-OMHCTF2021-grub题解" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/05/25/OMHCTF2021-grub%E9%A2%98%E8%A7%A3/">OMHCTF2021 grub题解</a>
+    </h1>
+  
+
+        
+        <a href="/2021/05/25/OMHCTF2021-grub%E9%A2%98%E8%A7%A3/" class="archive-article-date">
+  	<time datetime="2021-05-25T10:56:34.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-05-25</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>windows打开iso文件，读取 grub.cfg，里面有检查flag的 shell 脚本</p>
+<p>linux下打开 iso 文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo mount -o loop grub.iso tmp</span><br></pre></td></tr></table></figure>
+<p>shell 脚本学习：<a target="_blank" rel="noopener" href="https://www.runoob.com/linux/linux-shell-variable.html">https://www.runoob.com/linux/linux-shell-variable.html</a></p>
+<p>shell 脚本中，<code>$</code>是关键字，正则表达式的pattern字符串想要使用<code>$</code>字符的话，必须转义，使用<code>\$</code></p>
+<p>grub.cfg内容如下</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br></pre></td><td class="code"><pre><span class="line">echo -n &quot;Enter flag: &quot;</span><br><span class="line">read flag</span><br><span class="line"></span><br><span class="line">if ! regexp --set a &quot;^p4\&#123;([0-9A-Q]&#123;54&#125;)\&#125;\$&quot; &quot;$flag&quot;; then halt; fi</span><br><span class="line">while [ &quot;$a&quot; != &quot;&quot; ]; do</span><br><span class="line">    if regexp --set a &quot;^0(.*)\$&quot; &quot;$a&quot;; then b=&quot;$&#123;b&#125;aaa&quot;; fi</span><br><span class="line">    if regexp --set a &quot;^1(.*)\$&quot; &quot;$a&quot;; then b=&quot;$&#123;b&#125;aab&quot;; fi</span><br><span class="line">    if regexp --set a &quot;^2(.*)\$&quot; &quot;$a&quot;; then b=&quot;$&#123;b&#125;aac&quot;; fi</span><br><span class="line">    if regexp --set a &quot;^3(.*)\$&quot; &quot;$a&quot;; then b=&quot;$&#123;b&#125;aba&quot;; fi</span><br><span class="line">    if regexp --set a &quot;^4(.*)\$&quot; &quot;$a&quot;; then b=&quot;$&#123;b&#125;abb&quot;; fi</span><br><span class="line">    if regexp --set a &quot;^5(.*)\$&quot; &quot;$a&quot;; then b=&quot;$&#123;b&#125;abc&quot;; fi</span><br><span class="line">    if regexp --set a &quot;^6(.*)\$&quot; &quot;$a&quot;; then b=&quot;$&#123;b&#125;aca&quot;; fi</span><br><span class="line">    if regexp --set a &quot;^7(.*)\$&quot; &quot;$a&quot;; then b=&quot;$&#123;b&#125;acb&quot;; fi</span><br><span class="line">    if regexp --set a &quot;^8(.*)\$&quot; &quot;$a&quot;; then b=&quot;$&#123;b&#125;acc&quot;; fi</span><br><span class="line">    if regexp --set a &quot;^9(.*)\$&quot; &quot;$a&quot;; then b=&quot;$&#123;b&#125;baa&quot;; fi</span><br><span class="line">    if regexp --set a &quot;^A(.*)\$&quot; &quot;$a&quot;; then b=&quot;$&#123;b&#125;bab&quot;; fi</span><br><span class="line">    if regexp --set a &quot;^B(.*)\$&quot; &quot;$a&quot;; then b=&quot;$&#123;b&#125;bac&quot;; fi</span><br><span class="line">    if regexp --set a &quot;^C(.*)\$&quot; &quot;$a&quot;; then b=&quot;$&#123;b&#125;bba&quot;; fi</span><br><span class="line">    if regexp --set a &quot;^D(.*)\$&quot; &quot;$a&quot;; then b=&quot;$&#123;b&#125;bbb&quot;; fi</span><br><span class="line">    if regexp --set a &quot;^E(.*)\$&quot; &quot;$a&quot;; then b=&quot;$&#123;b&#125;bbc&quot;; fi</span><br><span class="line">    if regexp --set a &quot;^F(.*)\$&quot; &quot;$a&quot;; then b=&quot;$&#123;b&#125;bca&quot;; fi</span><br><span class="line">    if regexp --set a &quot;^G(.*)\$&quot; &quot;$a&quot;; then b=&quot;$&#123;b&#125;bcb&quot;; fi</span><br><span class="line">    if regexp --set a &quot;^H(.*)\$&quot; &quot;$a&quot;; then b=&quot;$&#123;b&#125;bcc&quot;; fi</span><br><span class="line">    if regexp --set a &quot;^I(.*)\$&quot; &quot;$a&quot;; then b=&quot;$&#123;b&#125;caa&quot;; fi</span><br><span class="line">    if regexp --set a &quot;^J(.*)\$&quot; &quot;$a&quot;; then b=&quot;$&#123;b&#125;cab&quot;; fi</span><br><span class="line">    if regexp --set a &quot;^K(.*)\$&quot; &quot;$a&quot;; then b=&quot;$&#123;b&#125;cac&quot;; fi</span><br><span class="line">    if regexp --set a &quot;^L(.*)\$&quot; &quot;$a&quot;; then b=&quot;$&#123;b&#125;cba&quot;; fi</span><br><span class="line">    if regexp --set a &quot;^M(.*)\$&quot; &quot;$a&quot;; then b=&quot;$&#123;b&#125;cbb&quot;; fi</span><br><span class="line">    if regexp --set a &quot;^N(.*)\$&quot; &quot;$a&quot;; then b=&quot;$&#123;b&#125;cbc&quot;; fi</span><br><span class="line">    if regexp --set a &quot;^O(.*)\$&quot; &quot;$a&quot;; then b=&quot;$&#123;b&#125;cca&quot;; fi</span><br><span class="line">    if regexp --set a &quot;^P(.*)\$&quot; &quot;$a&quot;; then b=&quot;$&#123;b&#125;ccb&quot;; fi</span><br><span class="line">    if regexp --set a &quot;^Q(.*)\$&quot; &quot;$a&quot;; then b=&quot;$&#123;b&#125;ccc&quot;; fi</span><br><span class="line">done</span><br><span class="line"></span><br><span class="line">while [ &quot;$b&quot; != &quot;&quot; ]; do</span><br><span class="line">    if regexp --set b &quot;^aa(.*)\$&quot; &quot;$b&quot;; then c=&quot;$&#123;c&#125;R&quot;; fi</span><br><span class="line">    if regexp --set b &quot;^ab(.*)\$&quot; &quot;$b&quot;; then c=&quot;$&#123;c&#125;S&quot;; fi</span><br><span class="line">    if regexp --set b &quot;^ac(.*)\$&quot; &quot;$b&quot;; then c=&quot;$&#123;c&#125;T&quot;; fi</span><br><span class="line">    if regexp --set b &quot;^ba(.*)\$&quot; &quot;$b&quot;; then c=&quot;$&#123;c&#125;U&quot;; fi</span><br><span class="line">    if regexp --set b &quot;^bb(.*)\$&quot; &quot;$b&quot;; then c=&quot;$&#123;c&#125;V&quot;; fi</span><br><span class="line">    if regexp --set b &quot;^bc(.*)\$&quot; &quot;$b&quot;; then c=&quot;$&#123;c&#125;W&quot;; fi</span><br><span class="line">    if regexp --set b &quot;^ca(.*)\$&quot; &quot;$b&quot;; then c=&quot;$&#123;c&#125;X&quot;; fi</span><br><span class="line">    if regexp --set b &quot;^cb(.*)\$&quot; &quot;$b&quot;; then c=&quot;$&#123;c&#125;Y&quot;; fi</span><br><span class="line">    if regexp --set b &quot;^cc(.*)\$&quot; &quot;$b&quot;; then c=&quot;$&#123;c&#125;Z&quot;; fi</span><br><span class="line">done</span><br><span class="line"></span><br><span class="line">function t &#123;</span><br><span class="line">    A=&quot;&quot;</span><br><span class="line">    B=&quot;$1&quot;</span><br><span class="line">    while [ &quot;$B&quot; != &quot;&quot; ]; do</span><br><span class="line">        regexp --set 1:C --set 2:B &quot;^([0-9]*),(.*)&quot; &quot;$B&quot;</span><br><span class="line">        regexp --set D &quot;^.&#123;$C&#125;(.)&quot; &quot;$c&quot;</span><br><span class="line">        A=&quot;$&#123;A&#125;$&#123;D&#125;&quot;</span><br><span class="line">    done</span><br><span class="line">    if ! regexp &quot;^R?S?T?U?V?W?X?Y?Z?\$&quot; &quot;$A&quot;; then halt; fi</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">function u &#123;</span><br><span class="line">    if ! regexp --set 1:R --set 2:S --set 3:T --set 4:U --set 5:V --set 6:W --set 7:X --set 8:Y --set 9:Z &quot;$1&quot; &quot;$c&quot;; then halt; fi</span><br><span class="line">    A=&quot;$R$S$T$U$V$W$X$Y$Z&quot;</span><br><span class="line">    if ! regexp R $A; then halt; fi</span><br><span class="line">    if ! regexp S $A; then halt; fi</span><br><span class="line">    if ! regexp T $A; then halt; fi</span><br><span class="line">    if ! regexp U $A; then halt; fi</span><br><span class="line">    if ! regexp V $A; then halt; fi</span><br><span class="line">    if ! regexp W $A; then halt; fi</span><br><span class="line">    if ! regexp X $A; then halt; fi</span><br><span class="line">    if ! regexp Y $A; then halt; fi</span><br><span class="line">    if ! regexp Z $A; then halt; fi</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">t &quot;27,18,9,0,1,2,11,10,&quot;</span><br><span class="line">t &quot;59,50,41,32,40,48,&quot;</span><br><span class="line">t &quot;51,50,49,48,&quot;</span><br><span class="line">t &quot;6,7,8,17,26,&quot;</span><br><span class="line">t &quot;54,64,74,66,76,&quot;</span><br><span class="line">t &quot;79,80,70,&quot;</span><br><span class="line"></span><br><span class="line">u &quot;^(.)(.)(.)(.)(.)(.)(.)(.)(.)&quot;</span><br><span class="line">u &quot;^.&#123;9&#125;(.)(.)(.)(.)(.)(.)(.)(.)(.)&quot;</span><br><span class="line">u &quot;^.&#123;18&#125;(.)(.)(.)(.)(.)(.)(.)(.)(.)&quot;</span><br><span class="line">u &quot;^.&#123;27&#125;(.)(.)(.)(.)(.)(.)(.)(.)(.)&quot;</span><br><span class="line">u &quot;^.&#123;36&#125;(.)(.)(.)(.)(.)(.)(.)(.)(.)&quot;</span><br><span class="line">u &quot;^.&#123;45&#125;(.)(.)(.)(.)(.)(.)(.)(.)(.)&quot;</span><br><span class="line">u &quot;^.&#123;54&#125;(.)(.)(.)(.)(.)(.)(.)(.)(.)&quot;</span><br><span class="line">u &quot;^.&#123;63&#125;(.)(.)(.)(.)(.)(.)(.)(.)(.)&quot;</span><br><span class="line">u &quot;^.&#123;72&#125;(.)(.)(.)(.)(.)(.)(.)(.)(.)&quot;</span><br><span class="line">u &quot;^(.).&#123;8&#125;(.).&#123;8&#125;(.).&#123;8&#125;(.).&#123;8&#125;(.).&#123;8&#125;(.).&#123;8&#125;(.).&#123;8&#125;(.).&#123;8&#125;(.)&quot;</span><br><span class="line">u &quot;^.&#123;1&#125;(.).&#123;8&#125;(.).&#123;8&#125;(.).&#123;8&#125;(.).&#123;8&#125;(.).&#123;8&#125;(.).&#123;8&#125;(.).&#123;8&#125;(.).&#123;8&#125;(.)&quot;</span><br><span class="line">u &quot;^.&#123;2&#125;(.).&#123;8&#125;(.).&#123;8&#125;(.).&#123;8&#125;(.).&#123;8&#125;(.).&#123;8&#125;(.).&#123;8&#125;(.).&#123;8&#125;(.).&#123;8&#125;(.)&quot;</span><br><span class="line">u &quot;^.&#123;3&#125;(.).&#123;8&#125;(.).&#123;8&#125;(.).&#123;8&#125;(.).&#123;8&#125;(.).&#123;8&#125;(.).&#123;8&#125;(.).&#123;8&#125;(.).&#123;8&#125;(.)&quot;</span><br><span class="line">u &quot;^.&#123;4&#125;(.).&#123;8&#125;(.).&#123;8&#125;(.).&#123;8&#125;(.).&#123;8&#125;(.).&#123;8&#125;(.).&#123;8&#125;(.).&#123;8&#125;(.).&#123;8&#125;(.)&quot;</span><br><span class="line">u &quot;^.&#123;5&#125;(.).&#123;8&#125;(.).&#123;8&#125;(.).&#123;8&#125;(.).&#123;8&#125;(.).&#123;8&#125;(.).&#123;8&#125;(.).&#123;8&#125;(.).&#123;8&#125;(.)&quot;</span><br><span class="line">u &quot;^.&#123;6&#125;(.).&#123;8&#125;(.).&#123;8&#125;(.).&#123;8&#125;(.).&#123;8&#125;(.).&#123;8&#125;(.).&#123;8&#125;(.).&#123;8&#125;(.).&#123;8&#125;(.)&quot;</span><br><span class="line">u &quot;^.&#123;7&#125;(.).&#123;8&#125;(.).&#123;8&#125;(.).&#123;8&#125;(.).&#123;8&#125;(.).&#123;8&#125;(.).&#123;8&#125;(.).&#123;8&#125;(.).&#123;8&#125;(.)&quot;</span><br><span class="line">u &quot;^.&#123;8&#125;(.).&#123;8&#125;(.).&#123;8&#125;(.).&#123;8&#125;(.).&#123;8&#125;(.).&#123;8&#125;(.).&#123;8&#125;(.).&#123;8&#125;(.).&#123;8&#125;(.)&quot;</span><br><span class="line">u &quot;^(.)(.)(.).&#123;6&#125;(.)(.)(.).&#123;6&#125;(.)(.)(.)&quot;</span><br><span class="line">u &quot;^.&#123;3&#125;(.)(.)(.).&#123;6&#125;(.)(.)(.).&#123;6&#125;(.)(.)(.)&quot;</span><br><span class="line">u &quot;^.&#123;6&#125;(.)(.)(.).&#123;6&#125;(.)(.)(.).&#123;6&#125;(.)(.)(.)&quot;</span><br><span class="line">u &quot;^.&#123;27&#125;(.)(.)(.).&#123;6&#125;(.)(.)(.).&#123;6&#125;(.)(.)(.)&quot;</span><br><span class="line">u &quot;^.&#123;30&#125;(.)(.)(.).&#123;6&#125;(.)(.)(.).&#123;6&#125;(.)(.)(.)&quot;</span><br><span class="line">u &quot;^.&#123;33&#125;(.)(.)(.).&#123;6&#125;(.)(.)(.).&#123;6&#125;(.)(.)(.)&quot;</span><br><span class="line">u &quot;^.&#123;54&#125;(.)(.)(.).&#123;6&#125;(.)(.)(.).&#123;6&#125;(.)(.)(.)&quot;</span><br><span class="line">u &quot;^.&#123;57&#125;(.)(.)(.).&#123;6&#125;(.)(.)(.).&#123;6&#125;(.)(.)(.)&quot;</span><br><span class="line">u &quot;^.&#123;60&#125;(.)(.)(.).&#123;6&#125;(.)(.)(.).&#123;6&#125;(.)(.)(.)&quot;</span><br><span class="line">u &quot;^(.).&#123;9&#125;(.).&#123;9&#125;(.).&#123;9&#125;(.).&#123;9&#125;(.).&#123;9&#125;(.).&#123;9&#125;(.).&#123;9&#125;(.).&#123;9&#125;(.)&quot;</span><br><span class="line">u &quot;^.&#123;8&#125;(.).&#123;7&#125;(.).&#123;7&#125;(.).&#123;7&#125;(.).&#123;7&#125;(.).&#123;7&#125;(.).&#123;7&#125;(.).&#123;7&#125;(.).&#123;7&#125;(.)&quot;</span><br><span class="line"></span><br><span class="line">echo</span><br><span class="line">echo &quot;That is correct.&quot;</span><br><span class="line">sleep 30</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<h3 id="正则表达式"><a href="#正则表达式" class="headerlink" title="正则表达式"></a>正则表达式</h3><p>原理学习网站：<a target="_blank" rel="noopener" href="https://www.runoob.com/regexp/regexp-syntax.html">https://www.runoob.com/regexp/regexp-syntax.html</a></p>
+<p>在线检测正则表达式的网站：<a target="_blank" rel="noopener" href="https://regexr.com/5thoj">https://regexr.com/5thoj</a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">if ! regexp --set a &quot;^p4\&#123;([0-9A-Q]&#123;54&#125;)\&#125;\$&quot; &quot;$flag&quot;; then halt; fi</span><br></pre></td></tr></table></figure>
+<p><code>&quot;^p4\&#123;([0-9A-Q]&#123;54&#125;)\&#125;\$&quot;</code> ，<code>^p4</code> 表示以p4开头，<code>\&#123;</code> 表示匹配符号<code>&#123;</code>，<code>[]</code>是限定符 ，<code>[0-9A-Q]</code>表示只匹配从0到9，从A到Q这些字符，<code>&#123;&#125;</code>是限定匹配次数符，<code>&#123;54&#125;</code> 表示匹配54次，多一次少一次都不行</p>
+<p><code>()</code>表示一个分区，匹配成功会返回分区内容，如输入<code>p4&#123;000000000000000000000000000000000000000000000000000000&#125;</code>，那么正则匹配的返回值会是<code>000000000000000000000000000000000000000000000000000000</code></p>
+<p><code>$</code>表示结束符</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">if regexp --set a &quot;^0(.*)\$&quot; &quot;$a&quot;; then b&#x3D;&quot;$&#123;b&#125;aaa&quot;; fi</span><br></pre></td></tr></table></figure>
+<p><code>&quot;^0(.*)\$&quot;</code> 其中 <code>(.*)</code> 表示一个分区，<code>.</code>表示除回车外任意字符，<code>*</code>表示任意次数匹配</p>
+<p> <code>b=&quot;$&#123;b&#125;aaa&quot;</code>是shell脚本语法，<code>$&#123;b&#125;</code>表示<code>b</code>本身，整个句意即 <code>b += &quot;aaa&quot;</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">if regexp --set b &quot;^aa(.*)\$&quot; &quot;$b&quot;; then c&#x3D;&quot;$&#123;c&#125;R&quot;; fi</span><br></pre></td></tr></table></figure>
+<p>基本同理了</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">regexp --set D &quot;^.&#123;$C&#125;(.)&quot; &quot;$c&quot;</span><br></pre></td></tr></table></figure>
+<p><code>&quot;^.&#123;$C&#125;(.)&quot;</code>中的<code>$c</code>首先会被shell脚本转义为c这个变量所代表的数字，比如说27，再拿去正则匹配 <code>^.&#123;27&#125;(.)</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">if ! regexp &quot;^R?S?T?U?V?W?X?Y?Z?\$&quot; &quot;$A&quot;; then halt; fi</span><br></pre></td></tr></table></figure>
+<p><code>?</code>表示可有可无，由于其没有<code>()</code>作为分区，所以一定要全匹配，一定要按RSTUVWXYZ的顺序出现，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">if ! regexp R $A; then halt; fi</span><br></pre></td></tr></table></figure>
+<p>在shell脚本中，没有<code>$</code>  的变量 如 <code>R</code>，实际上就是 字符 <code>&quot;R&quot;</code></p>
+<h3 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h3><p>flag长度54，b长度162，c长度81</p>
+<p>用z3 约束求解即可</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> z3 <span class="keyword">import</span> *</span><br><span class="line">s = Solver()</span><br><span class="line">num = [Int(<span class="string">&quot;num%d&quot;</span> % i) <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">81</span>)]</span><br><span class="line">f = <span class="built_in">open</span>(<span class="string">r&quot;D:\0Study3\OMH_2021_CTF\1.txt&quot;</span>,<span class="string">&quot;r&quot;</span>)</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">parse</span>(<span class="params">str1</span>):</span></span><br><span class="line">    list1 = []</span><br><span class="line">    num1 = <span class="number">0</span></span><br><span class="line">    i = <span class="number">0</span></span><br><span class="line">    <span class="keyword">while</span> i&lt;<span class="built_in">len</span>(str1):</span><br><span class="line">        <span class="comment"># print(i,end=&quot;,&quot;)</span></span><br><span class="line">        <span class="keyword">if</span> str1[i] == <span class="string">&quot;&#123;&quot;</span>:</span><br><span class="line">            <span class="keyword">if</span> str1[i+<span class="number">2</span>] == <span class="string">&quot;&#125;&quot;</span>:</span><br><span class="line">                num1 += <span class="built_in">int</span>(str1[i+<span class="number">1</span>])</span><br><span class="line">                i += <span class="number">2</span></span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                num1 += <span class="built_in">int</span>(str1[i + <span class="number">1</span>:i+<span class="number">3</span>])</span><br><span class="line">                i += <span class="number">3</span></span><br><span class="line">        <span class="keyword">if</span> str1[i] == <span class="string">&quot;(&quot;</span>:</span><br><span class="line">            list1.append(num1)</span><br><span class="line">            num1 += <span class="number">1</span></span><br><span class="line">            i += <span class="number">2</span></span><br><span class="line">        i += <span class="number">1</span></span><br><span class="line">    <span class="keyword">return</span> list1</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">81</span>):</span><br><span class="line">    s.add(num[i] &gt;= <span class="number">0</span>)</span><br><span class="line">    s.add(num[i] &lt; <span class="number">9</span>)</span><br><span class="line"><span class="keyword">while</span> <span class="number">1</span>:</span><br><span class="line">    line = f.readline()</span><br><span class="line">    <span class="keyword">if</span> line == <span class="string">&quot;&quot;</span>:</span><br><span class="line">        <span class="keyword">break</span></span><br><span class="line">    list1 = parse(line)</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">9</span>):</span><br><span class="line">        <span class="keyword">for</span> j <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">9</span>):</span><br><span class="line">            <span class="keyword">if</span> i != j:</span><br><span class="line">                s.add(num[list1[i]] != num[list1[j]])</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">t = []</span><br><span class="line">t.append([<span class="number">27</span>,<span class="number">18</span>,<span class="number">9</span>,<span class="number">0</span>,<span class="number">1</span>,<span class="number">2</span>,<span class="number">11</span>,<span class="number">10</span>])</span><br><span class="line">t.append([<span class="number">59</span>,<span class="number">50</span>,<span class="number">41</span>,<span class="number">32</span>,<span class="number">40</span>,<span class="number">48</span>])</span><br><span class="line">t.append([<span class="number">51</span>,<span class="number">50</span>,<span class="number">49</span>,<span class="number">48</span>])</span><br><span class="line">t.append([<span class="number">6</span>,<span class="number">7</span>,<span class="number">8</span>,<span class="number">17</span>,<span class="number">26</span>])</span><br><span class="line">t.append([<span class="number">54</span>,<span class="number">64</span>,<span class="number">74</span>,<span class="number">66</span>,<span class="number">76</span>])</span><br><span class="line">t.append([<span class="number">79</span>,<span class="number">80</span>,<span class="number">70</span>])</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(t)):</span><br><span class="line">    <span class="keyword">for</span> j <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(t[i])-<span class="number">1</span>):</span><br><span class="line">        s.add(num[t[i][j]] &lt; num[t[i][j+<span class="number">1</span>]])</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> s.check() == sat:</span><br><span class="line">    print(<span class="string">&quot;find!&quot;</span>)</span><br><span class="line">    m = s.model()</span><br><span class="line">    print(m)</span><br><span class="line">    ans = <span class="string">&quot;&quot;</span>.join(<span class="built_in">str</span>(m[num[i]]) <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">81</span>))</span><br><span class="line">    print(ans)</span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    print(<span class="string">&quot;no find!&quot;</span>)</span><br><span class="line"></span><br><span class="line">ans2 = <span class="string">&quot;&quot;</span></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(ans)):</span><br><span class="line">    n = <span class="built_in">int</span>(ans[i],<span class="number">10</span>)</span><br><span class="line">    c1 = n // <span class="number">3</span></span><br><span class="line">    c2 = n % <span class="number">3</span></span><br><span class="line">    ans2 += <span class="built_in">chr</span>(c1 + <span class="built_in">ord</span>(<span class="string">&quot;a&quot;</span>))</span><br><span class="line">    ans2 += <span class="built_in">chr</span>(c2 + <span class="built_in">ord</span>(<span class="string">&quot;a&quot;</span>))</span><br><span class="line"></span><br><span class="line">ans3 = <span class="string">&quot;&quot;</span></span><br><span class="line">table1 = <span class="string">&quot;0123456789ABCDEFGHIJKLMNOPQ&quot;</span></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">0</span>,<span class="built_in">len</span>(ans2),<span class="number">3</span>):</span><br><span class="line">    num = (<span class="built_in">ord</span>(ans2[i+<span class="number">0</span>]) - <span class="built_in">ord</span>(<span class="string">&#x27;a&#x27;</span>))*<span class="number">9</span> + (<span class="built_in">ord</span>(ans2[i+<span class="number">1</span>]) - <span class="built_in">ord</span>(<span class="string">&#x27;a&#x27;</span>))*<span class="number">3</span> + (<span class="built_in">ord</span>(ans2[i+<span class="number">2</span>]) - <span class="built_in">ord</span>(<span class="string">&#x27;a&#x27;</span>))</span><br><span class="line">    ans3 += table1[num]</span><br><span class="line"></span><br><span class="line">print(ans3)</span><br><span class="line">print(<span class="built_in">len</span>(ans3))</span><br><span class="line"></span><br><span class="line"><span class="comment">#DOO73LBP6EI461D6HP3N2MM6M953PKJ8MK1A2BGAB8FCIQE9Q4B96E</span></span><br></pre></td></tr></table></figure>
+
+
+
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">reverse</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">regexp</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">shell script</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">z3</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2021/05/25/OMHCTF2021-grub%E9%A2%98%E8%A7%A3/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-OMH-2021-CTF-flagsaver" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -550,11 +665,11 @@
         		</li>
       		 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">爆破</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">shell script</a>
         		</li>
       		 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">gdbScript</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">爆破</a>
         		</li>
       		
 		</ul>
@@ -1133,85 +1248,6 @@
 
 
   
-    <article id="post-两台linux虚拟机局域网通信" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2021/05/13/%E4%B8%A4%E5%8F%B0linux%E8%99%9A%E6%8B%9F%E6%9C%BA%E5%B1%80%E5%9F%9F%E7%BD%91%E9%80%9A%E4%BF%A1/">两台linux虚拟机局域网通信</a>
-    </h1>
-  
-
-        
-        <a href="/2021/05/13/%E4%B8%A4%E5%8F%B0linux%E8%99%9A%E6%8B%9F%E6%9C%BA%E5%B1%80%E5%9F%9F%E7%BD%91%E9%80%9A%E4%BF%A1/" class="archive-article-date">
-  	<time datetime="2021-05-13T10:47:24.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-05-13</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>目标：两台linux虚拟机能供成功互ping</p>
-<p>装备：一根网线，两台电脑，一个VMware虚拟机Ubuntu20，一个VMware虚拟机kali</p>
-<p>1.两台电脑用网线相连</p>
-<p>2.两台电脑虚拟机都是桥接方式</p>
-<p><img src="/picture/%E6%A1%A5%E6%8E%A5.png"></p>
-<p>3.两台电脑开启ping</p>
-<p><a target="_blank" rel="noopener" href="https://jingyan.baidu.com/article/b2c186c8ca2072c46ef6fff7.html">https://jingyan.baidu.com/article/b2c186c8ca2072c46ef6fff7.html</a></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">echo 0 &gt;&#x2F;proc&#x2F;sys&#x2F;net&#x2F;ipv4&#x2F;icmp_echo_ignore_all</span><br></pre></td></tr></table></figure>
-<p>4.设置两台虚拟机的ip地址，使其在同一网段</p>
-<p>首先ifconfig查看网卡名称</p>
-<p><img src="/picture/ifconfig.png"></p>
-<p>这台虚拟机的网卡名称是<code>ens33</code></p>
-<p>设置 网卡静态ip</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo ifconfig ens33 192.168.2.2 netmask 255.255.255.0</span><br></pre></td></tr></table></figure>
-<p>(注意，这种设置方法是一次性的，时常要用 ifconfig 命令查看ip有无被重置)</p>
-<p>另一台电脑操作同上，不过ip改成<code>192.168.2.1</code></p>
-<p>然后就可以互ping通讯了</p>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2021/05/13/%E4%B8%A4%E5%8F%B0linux%E8%99%9A%E6%8B%9F%E6%9C%BA%E5%B1%80%E5%9F%9F%E7%BD%91%E9%80%9A%E4%BF%A1/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
   
     <nav id="page-nav">
       <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" href="/page/2/">Next &amp;raquo;</a>
@@ -1357,11 +1393,19 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">爆破</a>
+                <a href="javascript:void(0)" class="js-tag color2">regexp</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">gdbScript</a>
+                <a href="javascript:void(0)" class="js-tag color3">shell script</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">z3</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">爆破</a>
               </li>
              
               <li class="article-tag-list-item">
