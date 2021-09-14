@@ -6,15 +6,36 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://example.com">
-  <title>Tag: c# | Hexo</title>
+  <title>AllesCTF2021逆向Monstrosity题解 | Hexo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="Hexo">
-<meta property="og:url" content="http://example.com/tags/c/index.html">
+  <meta name="description" content="前言以前学C#逆向都是不求甚解，基本只会用dnSpy反编译，这次就来 求甚解 一回 学习资料：《加密与解密》，https:&#x2F;&#x2F;black-frost.github.io&#x2F;posts&#x2F;allesctf_2021&#x2F; 什么是.NET什么是.NET Framework 由微软开发的，致力于敏捷开发、平台无关性的 软件开发平台 三个方面理解.NET  无论程序用C++还是C#编写，程序最终编译为,NET中间">
+<meta property="og:type" content="article">
+<meta property="og:title" content="AllesCTF2021逆向Monstrosity题解">
+<meta property="og:url" content="http://example.com/2021/09/13/AllesCTF2021%E9%80%86%E5%90%91Monstrosity%E9%A2%98%E8%A7%A3/index.html">
 <meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="前言以前学C#逆向都是不求甚解，基本只会用dnSpy反编译，这次就来 求甚解 一回 学习资料：《加密与解密》，https:&#x2F;&#x2F;black-frost.github.io&#x2F;posts&#x2F;allesctf_2021&#x2F; 什么是.NET什么是.NET Framework 由微软开发的，致力于敏捷开发、平台无关性的 软件开发平台 三个方面理解.NET  无论程序用C++还是C#编写，程序最终编译为,NET中间">
 <meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://raw.githubusercontent.com/m0v1ng/images/master/2021-06/20210913154839.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/m0v1ng/images/master/2021-09/20210913185917.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/m0v1ng/images/master/2021-09/20210913191852.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/m0v1ng/images/master/2021-09/20210913193506.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/m0v1ng/images/master/2021-09/20210914123752.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/m0v1ng/images/master/2021-09/20210913222355.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/m0v1ng/images/master/2021-09/20210913231022.png">
+<meta property="og:image" content="c:/Users/hwf/AppData/Roaming/Typora/typora-user-images/image-20210913231142976.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/m0v1ng/images/master/2021-09/20210913232050.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/m0v1ng/images/master/2021-09/20210913233633.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/m0v1ng/images/master/2021-09/20210914111356.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/m0v1ng/images/master/2021-09/20210914112059.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/m0v1ng/images/master/2021-09/20210914113148.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/m0v1ng/images/master/2021-09/20210914112939.png">
+<meta property="article:published_time" content="2021-09-14T04:57:16.000Z">
+<meta property="article:modified_time" content="2021-09-14T04:59:00.960Z">
 <meta property="article:author" content="John Doe">
+<meta property="article:tag" content="reverse">
+<meta property="article:tag" content="c#">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/m0v1ng/images/master/2021-06/20210913154839.png">
   
     <link rel="alternative" href="/atom.xml" title="Hexo" type="application/atom+xml">
   
@@ -150,36 +171,131 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
+            <article id="post-AllesCTF2021逆向Monstrosity题解" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
   
+    <h1 class="article-title" itemprop="name">
+      AllesCTF2021逆向Monstrosity题解
+    </h1>
   
-    
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2021" class="archive-year">2021</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2021/09/13/AllesCTF2021%E9%80%86%E5%90%91Monstrosity%E9%A2%98%E8%A7%A3/" class="archive-article-date">
+
+        
+        <a href="/2021/09/13/AllesCTF2021%E9%80%86%E5%90%91Monstrosity%E9%A2%98%E8%A7%A3/" class="archive-article-date">
   	<time datetime="2021-09-14T04:57:16.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-09-13</time>
 </a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2021/09/13/AllesCTF2021%E9%80%86%E5%90%91Monstrosity%E9%A2%98%E8%A7%A3/">AllesCTF2021逆向Monstrosity题解</a>
-    </h1>
-  
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>以前学C#逆向都是不求甚解，基本只会用dnSpy反编译，这次就来 求甚解 一回</p>
+<p>学习资料：《加密与解密》，<a target="_blank" rel="noopener" href="https://black-frost.github.io/posts/allesctf_2021/">https://black-frost.github.io/posts/allesctf_2021/</a></p>
+<h2 id="什么是-NET"><a href="#什么是-NET" class="headerlink" title="什么是.NET"></a>什么是.NET</h2><p>什么是.NET Framework</p>
+<p>由微软开发的，致力于敏捷开发、<strong>平台无关性</strong>的 软件开发平台</p>
+<p>三个方面理解.NET</p>
+<ul>
+<li>无论程序用C++还是C#编写，程序最终编译为,NET中间语言IL</li>
+<li>可执行文件不再保存机器码，而是保存IL指令和元数据</li>
+<li>Windows不再负责程序的运行，而是对.NET框架进行管理，框架中的 JIT引擎 负责在运行时将IL代码即时编译为 本地汇编代码后执行</li>
+</ul>
+<p>更多概念</p>
+<ul>
+<li>Common Lanuage Runtime（简称CLR），CLR 是 IL语言的运行环境。在windows平台上，本质就是几个Ring3的DLL，如mscorwks.dll，mscorjit.dll，特点是以mscor开头</li>
+<li>Just In-Time Compile 即时编译（即 JIT引擎），是.NET 运行可执行文件的基本方式</li>
+<li>Metadata（元数据）是一个可执行文件的所有信息，包括一个类的所有成员信息等，为了区分各项Metadata，需要一个单独的标识，这个标识就是token，token是同一程序中区分和定位不同元数据的依据</li>
+<li>Assembly，Module，Type，Method</li>
+</ul>
+<p>IDA打开一个C#写的程序，下面这些就是其 IL 代码</p>
+<p><img src="https://raw.githubusercontent.com/m0v1ng/images/master/2021-06/20210913154839.png"></p>
+<h2 id="NET-EXE文件结构"><a href="#NET-EXE文件结构" class="headerlink" title=".NET EXE文件结构"></a>.NET EXE文件结构</h2><p>回顾Win32平台的PE结构，其中有几个Data Directory是没有被使用的，.Net对它们进行了拓展，第15项目录存储了一个偏移，这个偏移指向了EXE文件的 .text 区块，传统Win32程序 .text区块存储ASM汇编指令，.NET程序 的 .text模块有自己的结构，其结构如下</p>
+<p><img src="https://raw.githubusercontent.com/m0v1ng/images/master/2021-09/20210913185917.png"></p>
+<p>Common Language Runtime头：结构和属性含义略</p>
+<p>元数据：MetaData结构以一个元数据头开始（元数据头结构属性略），紧接着是几个数据流的头，头中说明了数据流的的<strong>相对偏移</strong>、大小和名称</p>
+<p>.NET有以下几个常用的流</p>
+<ul>
+<li>#Strings ：元数据的名称</li>
+<li>#Blob：程序中的非字符串数据</li>
+<li>#GUID：全局唯一标识（Global Unique Identifier）</li>
+<li>#US：以Unicode格式存放的 IL代码中使用的用户字符串</li>
+<li>#~ ：元数据表流，几乎所有元数据信息以表的形式保存于此</li>
+</ul>
+<p>每个数据流也有自己的结构，在此略</p>
+<p>CFF_explorer 查看 .NET 文件结构</p>
+<p><img src="https://raw.githubusercontent.com/m0v1ng/images/master/2021-09/20210913191852.png"></p>
+<h2 id="IL代码"><a href="#IL代码" class="headerlink" title="IL代码"></a>IL代码</h2><ul>
+<li>IL 源代码文件 拓展名为  <code>.il</code></li>
+<li>注释符 <code>//</code>  ,<code>/**/</code></li>
+<li>IL 源文件入口方法不一定是Main，可以用 .entrypoint 来表示</li>
+<li>.assembly定义本程序集，.assembly extern定义被引用的程序集，两者分别对应元数据表中的 Assembly 和 AssemblyRef</li>
+<li>mscorlib是所有.NET程序的基础，每个程序都会用它</li>
+<li>本地变量（由.locals定义）可以用名称引用（ldloc val），也可以序号表示（ldloc.0）</li>
+<li>IL空指令 nop 的机器码是 0x00</li>
+</ul>
+<p>IL语言最大的特点是以栈为基础，类似于Python的opcode</p>
+<p><img src="https://raw.githubusercontent.com/m0v1ng/images/master/2021-09/20210913193506.png"></p>
+<p>IL代码与元数据结合</p>
+<p>IL以元数据为操作对象，其本身又由元数据限定。Token是元数据项的唯一标识，IL通过Token来定位和引用元数据，Token实际上是一个UNIT32，形如<code>AABBBBBB</code>，<code>AA</code>标识对应表，<code>BBBBBB</code>标识表中的位置，如 Taken = 0x60000007，<code>60</code>  表示 MethodDef（也叫Method） 表，<code>000007</code> 表示 表中索引为 7的项</p>
+<h2 id="NET-代码基本保护技术"><a href="#NET-代码基本保护技术" class="headerlink" title=".NET 代码基本保护技术"></a>.NET 代码基本保护技术</h2><p>强名称（类似CRC校验）：工具Strong Name Remove 把 强名称 Patch掉即可</p>
+<p>名称混淆：修复名称即可</p>
+<p>流程混淆（类似花指令），可以阻止 IL 代码被轻易 反编译为 C# 代码</p>
+<p>压缩壳（不含MetaData加密功能），如压缩壳Sixxpack将原程序压缩后存储在新文件中，在运行时动态解压到 byte[] 数组中，核心代码如下：</p>
+<figure class="highlight c#"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Assembly assembly1 = Assembly.Load(buffer);</span><br><span class="line">assembly1.EntryPoint.Invoke(<span class="literal">null</span>,<span class="literal">null</span>);</span><br></pre></td></tr></table></figure>
+<p>脱壳思路是 dump 目标文件</p>
+<p>压缩壳（含MetaData加密功能）：</p>
+<p>.NET PE文件加载过程：mscoree.dll一直存在，随后加载 mscorwks.dll ，然后是mscorlib.dll ，接着是 mscorjit.dll</p>
+<p>遇到没有编译的方法时，mscorwks 调用 JIT 把代码编译成 ASM 后，将控制权交给ASM，执行完毕 mscorwks 收回控制权。大多数加密软件都以这两个dll 为突破口，进行 hook、pack操作，种种操作的目的都是 <strong>在 JIT前把被加密的 IL 代码和 Metadata 恢复正常</strong></p>
+<h2 id="AllesCTF2021-Monstrosity"><a href="#AllesCTF2021-Monstrosity" class="headerlink" title="[AllesCTF2021] Monstrosity"></a>[AllesCTF2021] Monstrosity</h2><p>题目直接说明了是C++/CLI编写的，C++/CLI混合编译的程序中即可保存托管代码（IL代码），又可以保存本地代码（ASM汇编代码）</p>
+<p>经典图片：</p>
+<p><img src="https://raw.githubusercontent.com/m0v1ng/images/master/2021-09/20210914123752.png"></p>
+<p>用dnSpy分析这个exe，搜索main函数</p>
+<p><img src="https://raw.githubusercontent.com/m0v1ng/images/master/2021-09/20210913222355.png"></p>
+<p>可以看到main函数用了类似  <code>不含MetaData加密的压缩壳</code> 的手法进行了压缩，真正的dll 藏在了 EXE文件的 resourse中，然后调用这个dll的 Maze.MazeWalker.startWalking 函数，我们利用CFF explorer 导出这个 dll</p>
+<p>接下来我们分析这个dll</p>
+<p>有一个10*10的迷宫，每个maze的点由MazeWalker的一个函数控制，这就是MazeWalker里100个形如visitField_x_x函数的作用，比如初始在visitField_0_0函数中，向下走一步，程序就会执行visitField_0_1函数。每次执行visitField_x_x函数之前，都会执行checkLastTransition函数，这个函数会检查你上一步走得合不合理</p>
+<p><img src="https://raw.githubusercontent.com/m0v1ng/images/master/2021-09/20210913231022.png"></p>
+<p>接下来看一下maze类</p>
+<p>把timestame作为seed生成的一个 maze，每一个点都有上下左右的某些Flag，联系上面的代码，这些Flag决定了哪些方向不能走</p>
+<p><img src="C:\Users\hwf\AppData\Roaming\Typora\typora-user-images\image-20210913231142976.png" alt="image-20210913231142976"></p>
+<p>回过头去看main函数，我们还有一处没有分析，main函数创建了一个线程</p>
+<p><img src="https://raw.githubusercontent.com/m0v1ng/images/master/2021-09/20210913232050.png"></p>
+<p>右键点击线程入口函数，可以看到入口函数的RVA <code>0xB648</code>，我们用ida 以 PE格式打开exe，跳转到这个地址</p>
+<p>这是个典型的 <strong>JIT hook</strong></p>
+<p><img src="https://raw.githubusercontent.com/m0v1ng/images/master/2021-09/20210913233633.png"></p>
+<p>跟进到sub_140001950，这个函数根据 token 修改了两个地方</p>
+<p><img src="https://raw.githubusercontent.com/m0v1ng/images/master/2021-09/20210914111356.png"></p>
+<p>a3是CORINFO_METHOD_INFO结构体，可以在 <a target="_blank" rel="noopener" href="https://github.com/xoofx/ManagedJit/blob/master/ManagedJit/ManagedJit.cs#L409">https://github.com/xoofx/ManagedJit/blob/master/ManagedJit/ManagedJit.cs#L409</a> 看到它的定义，a3[2]正好指向 ILcode</p>
+<blockquote>
+<p>至于为什么a3是CORINFO_METHOD_INFO结构，token又是如何识别出来的，我也不太懂，应该是 getJit 函数的函数调用规则吧</p>
+</blockquote>
+<p>查MethodDef表可知，id为7的函数正好是 Maze.GetRandomSeed</p>
+<p>我们手动 patch GetRandomSeed 的 ILcode 代码，可以得到真正运行的函数</p>
+<p><img src="https://raw.githubusercontent.com/m0v1ng/images/master/2021-09/20210914112059.png"></p>
+<p>对于修改的第二个地方，可以看到他修改的是visitField_x_x函数的 <code>awsd</code> 操作码</p>
+<p><img src="https://raw.githubusercontent.com/m0v1ng/images/master/2021-09/20210914113148.png"></p>
+<p><img src="https://raw.githubusercontent.com/m0v1ng/images/master/2021-09/20210914112939.png"></p>
+<p>迷宫有了，操作码有了，就可以开始解了（迷宫可以通过dnspy动态调试dump下来得到）</p>
+<p>这里懒得写了，抄袭别人的脚本了</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> struct</span><br><span class="line"></span><br><span class="line">md_token = [[i <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">10</span>)] <span class="keyword">for</span> k <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">10</span>)]  <span class="comment">#init 2 dim array</span></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">10</span>):</span><br><span class="line">    <span class="keyword">for</span> j <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">10</span>):</span><br><span class="line">        md_token[i][j] = <span class="number">0x10</span> + <span class="number">10</span>*j + i</span><br><span class="line">        <span class="comment">#print(&quot;%d %d:\t%s&quot;,i, j, hex(md_token[i][j]))</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_code</span>(<span class="params">token</span>):</span></span><br><span class="line">    code = &#123;&#125;</span><br><span class="line">    code[<span class="string">&quot;w&quot;</span>] = <span class="built_in">chr</span>(<span class="built_in">ord</span>(<span class="string">&quot;a&quot;</span>) + (token + <span class="number">13</span>) % <span class="number">0x1a</span>)</span><br><span class="line">    code[<span class="string">&quot;a&quot;</span>] = <span class="built_in">chr</span>(<span class="built_in">ord</span>(<span class="string">&quot;a&quot;</span>) + (token + <span class="number">43</span>) % <span class="number">0x1a</span>)</span><br><span class="line">    code[<span class="string">&quot;s&quot;</span>] = <span class="built_in">chr</span>(<span class="built_in">ord</span>(<span class="string">&quot;a&quot;</span>) + (token + <span class="number">57</span>) % <span class="number">0x1a</span>)</span><br><span class="line">    code[<span class="string">&quot;d&quot;</span>] = <span class="built_in">chr</span>(<span class="built_in">ord</span>(<span class="string">&quot;a&quot;</span>) + (token + <span class="number">24</span>) % <span class="number">0x1a</span>)</span><br><span class="line">    <span class="keyword">return</span> code</span><br><span class="line">   </span><br><span class="line"><span class="comment">#print(md_token)   </span></span><br><span class="line"><span class="comment">#print(hex(md_token[0][0]))</span></span><br><span class="line"><span class="comment">#code = get_code(md_token[0][0])</span></span><br><span class="line"><span class="comment">#print(&#123;i : chr(code[i]) for i in code&#125;)</span></span><br><span class="line"></span><br><span class="line">TOP = <span class="number">1</span></span><br><span class="line">RIGHT = <span class="number">2</span> </span><br><span class="line">BOTTOM = <span class="number">4</span></span><br><span class="line">LEFT = <span class="number">8</span></span><br><span class="line"></span><br><span class="line">maze = [[i <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">10</span>)] <span class="keyword">for</span> k <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">10</span>)]</span><br><span class="line"><span class="keyword">with</span> <span class="built_in">open</span>(<span class="string">r&quot;D:\0Study5\re\Monstrosity\maze.bin&quot;</span>, <span class="string">&quot;rb&quot;</span>) <span class="keyword">as</span> f:</span><br><span class="line">    <span class="comment">#data = f.read()</span></span><br><span class="line">    <span class="keyword">for</span> x <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">10</span>):</span><br><span class="line">        <span class="keyword">for</span> y <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">10</span>):</span><br><span class="line">            maze[x][y] = struct.unpack(<span class="string">&quot;&lt;I&quot;</span>, f.read(<span class="number">4</span>))[<span class="number">0</span>]</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">maze_walk</span>(<span class="params">maze, x0, y0</span>):</span></span><br><span class="line">    visited = [[<span class="number">0</span> <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">10</span>)] <span class="keyword">for</span> k <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">10</span>)]</span><br><span class="line">    queue = []</span><br><span class="line">    queue.append([(x0,y0)])</span><br><span class="line">    <span class="keyword">while</span> (<span class="built_in">len</span>(queue) != <span class="number">0</span>):</span><br><span class="line">        path = queue.pop(<span class="number">0</span>)</span><br><span class="line">        (x,y) = path[-<span class="number">1</span>]</span><br><span class="line">        visited[x][y] = <span class="literal">True</span></span><br><span class="line">        <span class="keyword">if</span> (x == <span class="number">9</span> <span class="keyword">and</span> y == <span class="number">9</span>):</span><br><span class="line">            <span class="keyword">return</span> path</span><br><span class="line">        status = maze[x][y]</span><br><span class="line">        neighbor = []</span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> (status &amp; TOP) <span class="keyword">and</span> y &gt; <span class="number">0</span>:</span><br><span class="line">            neighbor.append((x, y -<span class="number">1</span>))</span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">not</span> (status &amp; BOTTOM) <span class="keyword">and</span> y &lt; <span class="number">9</span>):</span><br><span class="line">            neighbor.append((x, y + <span class="number">1</span>))</span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">not</span> (status &amp; LEFT) <span class="keyword">and</span> x &gt; <span class="number">0</span>):</span><br><span class="line">            neighbor.append((x - <span class="number">1</span>, y))</span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">not</span> (status &amp; RIGHT) <span class="keyword">and</span> x &lt; <span class="number">9</span>):</span><br><span class="line">            neighbor.append((x + <span class="number">1</span>, y))</span><br><span class="line">        <span class="comment">#print(neighbor)</span></span><br><span class="line">        new_path = [path + [(x,y)] <span class="keyword">for</span> (x,y) <span class="keyword">in</span> neighbor <span class="keyword">if</span> <span class="keyword">not</span> visited[x][y]]</span><br><span class="line">        queue += new_path</span><br><span class="line">    print(<span class="string">&quot;WRONG&quot;</span>)</span><br><span class="line">        </span><br><span class="line">        </span><br><span class="line">        </span><br><span class="line">sol = maze_walk(maze, <span class="number">0</span>, <span class="number">0</span>)</span><br><span class="line">flag = <span class="string">&quot;&quot;</span></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(sol) - <span class="number">1</span>):</span><br><span class="line">    (x,y) = sol[i]</span><br><span class="line">    (x1,y1) = sol[i + <span class="number">1</span>]</span><br><span class="line">    code = get_code(md_token[x][y])</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">if</span> x1 &lt; x:  <span class="comment">#Left</span></span><br><span class="line">        flag += code[<span class="string">&quot;a&quot;</span>]</span><br><span class="line">    <span class="keyword">elif</span> x1 &gt; x: <span class="comment">#Right</span></span><br><span class="line">        flag += code[<span class="string">&quot;d&quot;</span>]</span><br><span class="line">    <span class="keyword">elif</span> y1 &gt; y: <span class="comment">#Down</span></span><br><span class="line">        flag += code[<span class="string">&quot;s&quot;</span>]</span><br><span class="line">    <span class="keyword">elif</span> y1 &lt; y: <span class="comment">#Up</span></span><br><span class="line">        flag += code[<span class="string">&quot;w&quot;</span>]</span><br><span class="line">print(<span class="string">&quot;ALLES!&#123;%s&#125;&quot;</span>%flag)</span><br><span class="line">    </span><br><span class="line"><span class="comment"># ALLES!&#123;vfpzjtwmcdlvygjzabcsmlkjefgwmndxwrstucmwzhrucylowsfi&#125;</span></span><br></pre></td></tr></table></figure>
 
-        <div class="article-info info-on-right">
-          
+
+
+
+
+
+
+
+
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
@@ -195,61 +311,119 @@
 		</ul>
 	</div>
 
-          
+      
 
+      
+
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
         </div>
-        <div class="clearfix"></div>
-    </header>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//pan.baidu.com/share/qrcode?url=http://example.com/2021/09/13/AllesCTF2021%E9%80%86%E5%90%91Monstrosity%E9%A2%98%E8%A7%A3/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
+
   
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2021/05/23/OMH-2021-CTF-flagsaver/" class="archive-article-date">
-  	<time datetime="2021-05-24T04:48:32.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-05-23</time>
-</a>
+<nav id="article-nav">
+  
+  
+    <a href="/2021/05/26/DCTF2021-bell/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">DCTF2021 bell</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
         </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2021/05/23/OMH-2021-CTF-flagsaver/">OMH_2021_CTF flagsaver</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">reverse</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">c#</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
+        
+        
+        <div class="toc-container tooltip-left">
+            <i class="icon-font icon-category"></i>
+            <div class="tooltip tooltip-east">
+                <span class="tooltip-item">
+                </span>
+                <span class="tooltip-content">
+                    <div class="toc-article">
+                    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%A8%80"><span class="toc-number">1.</span> <span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF-NET"><span class="toc-number">2.</span> <span class="toc-text">什么是.NET</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#NET-EXE%E6%96%87%E4%BB%B6%E7%BB%93%E6%9E%84"><span class="toc-number">3.</span> <span class="toc-text">.NET EXE文件结构</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#IL%E4%BB%A3%E7%A0%81"><span class="toc-number">4.</span> <span class="toc-text">IL代码</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#NET-%E4%BB%A3%E7%A0%81%E5%9F%BA%E6%9C%AC%E4%BF%9D%E6%8A%A4%E6%8A%80%E6%9C%AF"><span class="toc-number">5.</span> <span class="toc-text">.NET 代码基本保护技术</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#AllesCTF2021-Monstrosity"><span class="toc-number">6.</span> <span class="toc-text">[AllesCTF2021] Monstrosity</span></a></li></ol>
+                    </div>
+                </span>
+            </div>
         </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
+        
+    </div>
+</aside>
+
+
+
   
   
-    </div></section>
   
 
-    
+  
+
+  
+
+  
 
 
           </div>
@@ -272,9 +446,9 @@
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: false,
+		isPost: true,
 		isArchive: false,
-		isTag: true,
+		isTag: false,
 		isCategory: false,
 		open_in_new: false,
 		toc_hide_index: true,
