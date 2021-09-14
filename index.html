@@ -239,7 +239,7 @@
 <p><img src="https://raw.githubusercontent.com/m0v1ng/images/master/2021-09/20210913231022.png"></p>
 <p>接下来看一下maze类</p>
 <p>把timestame作为seed生成的一个 maze，每一个点都有上下左右的某些Flag，联系上面的代码，这些Flag决定了哪些方向不能走</p>
-<p><img src="C:\Users\hwf\AppData\Roaming\Typora\typora-user-images\image-20210913231142976.png" alt="image-20210913231142976"></p>
+<p><img src="https://raw.githubusercontent.com/m0v1ng/images/master/2021-09/20210914140522.png"></p>
 <p>回过头去看main函数，我们还有一处没有分析，main函数创建了一个线程</p>
 <p><img src="https://raw.githubusercontent.com/m0v1ng/images/master/2021-09/20210913232050.png"></p>
 <p>右键点击线程入口函数，可以看到入口函数的RVA <code>0xB648</code>，我们用ida 以 PE格式打开exe，跳转到这个地址</p>
