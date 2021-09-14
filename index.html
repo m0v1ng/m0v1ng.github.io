@@ -152,6 +152,113 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-SangForCTF逆向safe-box题解" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/09/14/SangForCTF%E9%80%86%E5%90%91safe-box%E9%A2%98%E8%A7%A3/">SangForCTF逆向safe_box题解</a>
+    </h1>
+  
+
+        
+        <a href="/2021/09/14/SangForCTF%E9%80%86%E5%90%91safe-box%E9%A2%98%E8%A7%A3/" class="archive-article-date">
+  	<time datetime="2021-09-14T07:11:06.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-09-14</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="双进程守护"><a href="#双进程守护" class="headerlink" title="双进程守护"></a>双进程守护</h2><p>ida分析这个exe，发现是一个典型的双进程守护，核心函数如下：</p>
+<ul>
+<li>GetModuleFileNameW： 获取当前模块的基地址</li>
+<li>CreateProcessW： 以debugger模式创建一个自身副本</li>
+<li>WaitForDebugEvent：调试器等待程序的DebugEvent</li>
+<li>GetThreadContext：如果这个事件是调试器感兴趣的事件，就获取线程上下文 Context</li>
+<li>ReadProcessMemory：读取程序的内存</li>
+<li>WriteProcessMemory：修改程序的内存</li>
+<li>SetThreadContext：设置程序线程的上下文</li>
+<li>ContinueDebugEvent：让程序继续运行</li>
+</ul>
+<p>对于双进程守护，我一般有以下思路</p>
+<ul>
+<li>如果调试器逻辑很简单，写一个idaPython或idc脚本复原即可。这题我一开始就想这么做，但是失败了，主要是patch逻辑不太清晰，而且无法调试，出错不知道错哪里了</li>
+<li>修改rip，使其自己调用patch的代码，这个思路基本没办法实现，因为寄存器和内存环境没办法匹配</li>
+<li>hook api，比如 hook WriteProcessMemory，这个思路我比赛的时候没想起来</li>
+<li>使程序其正常运行，然后CheatEngine看内存，比对内存进行patch，比赛时我想出了这个方法</li>
+</ul>
+<h2 id="safe-box-题解"><a href="#safe-box-题解" class="headerlink" title="safe box 题解"></a>safe box 题解</h2><p>本题三个关卡</p>
+<p>第一个关卡由我两个可靠的队友devoke和loop解出，pwd1 == 1915969329</p>
+<p>第二个关卡是个xtea变种，pwd2=S_s0_fuNny，这里我上当了</p>
+<p>看如下ida伪c代码</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">v8 = v4 + *(_DWORD *)&amp;GWHT[<span class="number">4</span> * (v6 &amp; <span class="number">3</span>)];</span><br></pre></td></tr></table></figure>
+<p>把这个伪c代码变成c代码的时候，要把中括号内的<code>4 *</code>去掉，因为数据类型变成了uint32_t[] </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">uint32_t GWHT[4] &#x3D; &#123;71,87,72,84&#125;;</span><br><span class="line">v8 &#x3D; v4 + str[(sum &amp; 3)]</span><br></pre></td></tr></table></figure>
+<p>第三个关卡有点坑的</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">do</span></span><br><span class="line">&#123;</span><br><span class="line">  v9 = _mm_loadu_si128((<span class="keyword">const</span> __m128i *)&amp;input[v0 / <span class="number">4</span>]);</span><br><span class="line">  v10 = _mm_loadu_si128((<span class="keyword">const</span> __m128i *)&amp;rand_data[v0 / <span class="number">0x10</span>]);<span class="comment">// 和前4xor</span></span><br><span class="line">  v0 += <span class="number">16</span>i64;</span><br><span class="line">  rand_data[v0 / <span class="number">0x10</span> + <span class="number">9</span>] = (__int128)_mm_and_si128(</span><br><span class="line">                                         _mm_andnot_si128(_mm_and_si128(v9, v10), si128),</span><br><span class="line">                                         _mm_xor_si128(v9, v10));<span class="comment">// 本质就是xor</span></span><br><span class="line">  --v8;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这一段本质就是一个xor，通过真值表可知，式子<code>(~(a&amp;b))&amp;(a^b)</code>其实就是<code>a^b</code></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">do</span></span><br><span class="line">&#123;</span><br><span class="line">  v11 = _mm_loadu_si128((<span class="keyword">const</span> __m128i *)v6 - <span class="number">1</span>);</span><br><span class="line">  v6 += <span class="number">32</span>;</span><br><span class="line">  v12 = _mm_and_si128(v5, v11);</span><br><span class="line">  v13 = v11;</span><br><span class="line">  v14 = _mm_loadu_si128((<span class="keyword">const</span> __m128i *)v6 - <span class="number">2</span>);</span><br><span class="line">  *(__m128i *)&amp;v6[(<span class="keyword">char</span> *)ror_data - rand_data - <span class="number">112</span>] = _mm_or_si128(</span><br><span class="line">                                                          _mm_and_si128(_mm_srl_epi32(v13, v8), si128),</span><br><span class="line">                                                          _mm_sll_epi32(v12, v9));</span><br><span class="line">  *(__m128i *)&amp;v6[(<span class="keyword">char</span> *)v99 - rand_data - <span class="number">112</span>] = _mm_or_si128(</span><br><span class="line">                                                     _mm_and_si128(_mm_srl_epi32(v14, v8), si128),</span><br><span class="line">                                                     _mm_sll_epi32(_mm_and_si128(v5, v14), v9));</span><br><span class="line">  --v10;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">while</span> ( v10 );</span><br></pre></td></tr></table></figure>
+<p>这一段本质是一个2字节的ror指令，详情略</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">reverse</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">双进程守护</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2021/09/14/SangForCTF%E9%80%86%E5%90%91safe-box%E9%A2%98%E8%A7%A3/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-AllesCTF2021逆向Monstrosity题解" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -1219,106 +1326,9 @@
 
 
   
-    <article id="post-MRCTF2021逆向Ezgame" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2021/05/16/MRCTF2021%E9%80%86%E5%90%91Ezgame/">MRCTF2021逆向Ezgame</a>
-    </h1>
-  
-
-        
-        <a href="/2021/05/16/MRCTF2021%E9%80%86%E5%90%91Ezgame/" class="archive-article-date">
-  	<time datetime="2021-05-16T14:14:22.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-05-16</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>比赛的时候差一个Ezgame AK re，比赛结束后因为种种原因没有时间复盘，现在终于把这题复盘了</p>
-<p>Unity编写的程序，是个游戏，完成固定的任务就可以得到flag，吃星星，不能死太多次（后来知道原来一次都不能死），吃个cookie（必死一次），遇到外星人（根本找不到在哪里）</p>
-<p>dnSpy分析其GameAssembly.dll，或者用Il2CppDumper分析其GameAssembly.dll，我用的是后者（比赛的时候dnSpy坏了），具体用法看github 上 Il2CppDumper 的 readme.md，得到很多文件，查看dump.cs,这里存储了GameAssembly.dll导出的函数，发现只有各个函数的相对偏移RVA，没有其具体实现，很奇怪（后来知道似乎是加了个很难破的壳），比赛的时候就卡在这了</p>
-<h2 id="CE-dump分析"><a href="#CE-dump分析" class="headerlink" title="CE+dump分析"></a>CE+dump分析</h2><p>分析其C#脚本的路走不通，但是这是个游戏，满足条件即可胜利，下面参考<a target="_blank" rel="noopener" href="https://www.52pojie.cn/thread-1417678-1-1.html">https://www.52pojie.cn/thread-1417678-1-1.html</a></p>
-<p>利用CE，通过星星数目的变化和死亡次数的变化可以定位到其内存地址</p>
-<p>星星数内存地址是63003E40，由其开始的内存如下（复现的时候忘记截图了）</p>
-<p><img src="/picture/1/%E5%BE%AE%E4%BF%A1%E6%88%AA%E5%9B%BE_20210516181026.png"></p>
-<p>完成吃cookie任务后发现内存一个数值发生了变化</p>
-<p><img src="/picture/1/change.png"></p>
-<p>这个01很明显就是判断是否完成任务（另外8个是key）的，把所有任务都置1，星星数改成105，getFlag</p>
-<p><img src="/picture/1/%E5%BE%AE%E4%BF%A1%E6%88%AA%E5%9B%BE_20210516150410.png"></p>
-<p>说明有检测，我们想看看谁访问了星星数，以便定位关键代码，用CE一attach马上程序就退出了，说明有反调试，但是我们又没办法静态分析（他加壳了），怎么办呢，Dump！</p>
-<p>用 windbg attach程序，程序退出后，windbg输入命令 <code>.dump /ma dump出的文件存储的路径</code>，得到dump程序加以分析，ida分析dump，找到GameAssembly.dll的段，通过前面Il2CppDumper得到的文件dump.cs各函数的RVA，可以定位每个函数的地址，至此，就有了可以静态分析的函数了</p>
-<p>EatTokenUpdateKey函数</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">__int64 <span class="title">sub_7FFEFBB74360</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">void</span> *__ptr32 *__ptr32 ***v0; <span class="comment">// rax</span></span><br><span class="line">  __int64 v1; <span class="comment">// rbp</span></span><br><span class="line">  <span class="keyword">void</span> *__ptr32 *__ptr32 ***v2; <span class="comment">// rax</span></span><br><span class="line">  __int64 v3; <span class="comment">// rsi</span></span><br><span class="line">  <span class="keyword">int</span> v4; <span class="comment">// edi</span></span><br><span class="line">  __int64 v5; <span class="comment">// rbx</span></span><br><span class="line">  <span class="keyword">unsigned</span> __int64 v6; <span class="comment">// rdx</span></span><br><span class="line">  <span class="keyword">void</span> *__ptr32 *__ptr32 **v7; <span class="comment">// rcx</span></span><br><span class="line">  __int64 result; <span class="comment">// rax</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> ( !byte_7FFEFBECF4FA )</span><br><span class="line">  &#123;</span><br><span class="line">    ((<span class="keyword">void</span> (__fastcall *)(_QWORD))unk_7FFEFB52D490)((<span class="keyword">unsigned</span> <span class="keyword">int</span>)dword_7FFEFBC54688);</span><br><span class="line">    byte_7FFEFBECF4FA = <span class="number">1</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  v0 = off_7FFEFC178260;</span><br><span class="line">  <span class="keyword">if</span> ( (*((_BYTE *)off_7FFEFC178260 + <span class="number">303</span>) &amp; <span class="number">2</span>) != <span class="number">0</span> &amp;&amp; !*((_DWORD *)off_7FFEFC178260 + <span class="number">56</span>) )</span><br><span class="line">  &#123;</span><br><span class="line">    ((<span class="keyword">void</span> (__fastcall *)(<span class="keyword">void</span> *__ptr32 *__ptr32 ***))gameassembly_il2cpp_runtime_class_init)(off_7FFEFC178260);</span><br><span class="line">    v0 = off_7FFEFC178260;</span><br><span class="line">  &#125;</span><br><span class="line">  v1 = <span class="number">4</span>i64;</span><br><span class="line">  ++*(_DWORD *)v0[<span class="number">23</span>];</span><br><span class="line">  <span class="keyword">do</span></span><br><span class="line">  &#123;</span><br><span class="line">    v2 = off_7FFEFC178260;</span><br><span class="line">    v3 = <span class="number">0</span>i64;</span><br><span class="line">    v4 = <span class="number">0</span>;</span><br><span class="line">    v5 = <span class="number">1</span>i64;</span><br><span class="line">    <span class="keyword">do</span></span><br><span class="line">    &#123;</span><br><span class="line">      <span class="keyword">if</span> ( (*((_BYTE *)v2 + <span class="number">303</span>) &amp; <span class="number">2</span>) != <span class="number">0</span> &amp;&amp; !*((_DWORD *)v2 + <span class="number">56</span>) )</span><br><span class="line">      &#123;</span><br><span class="line">        ((<span class="keyword">void</span> (__fastcall *)(<span class="keyword">void</span> *__ptr32 *__ptr32 ***))gameassembly_il2cpp_runtime_class_init)(v2);</span><br><span class="line">        v2 = off_7FFEFC178260;</span><br><span class="line">      &#125;</span><br><span class="line">      v6 = (v5 &amp; (<span class="keyword">unsigned</span> __int64)v2[<span class="number">23</span>][<span class="number">1</span>]) &gt;&gt; (v4++ &amp; <span class="number">0x3F</span>);</span><br><span class="line">      v3 ^= v6;</span><br><span class="line">      v5 = __ROL8__(v5, <span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">while</span> ( v4 &lt; <span class="number">64</span> );</span><br><span class="line">    <span class="keyword">if</span> ( (*((_BYTE *)v2 + <span class="number">303</span>) &amp; <span class="number">2</span>) != <span class="number">0</span> &amp;&amp; !*((_DWORD *)v2 + <span class="number">56</span>) )</span><br><span class="line">    &#123;</span><br><span class="line">      ((<span class="keyword">void</span> (__fastcall *)(<span class="keyword">void</span> *__ptr32 *__ptr32 ***))gameassembly_il2cpp_runtime_class_init)(v2);</span><br><span class="line">      v2 = off_7FFEFC178260;</span><br><span class="line">    &#125;</span><br><span class="line">    v7 = v2[<span class="number">23</span>];</span><br><span class="line">    result = v3 | (<span class="number">2</span>i64 * (_QWORD)v7[<span class="number">1</span>]);</span><br><span class="line">    v7[<span class="number">1</span>] = (<span class="keyword">void</span> *__ptr32 *__ptr32 *)result;</span><br><span class="line">    --v1;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">while</span> ( v1 );</span><br><span class="line">  <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>我们恢复这个代码，让他执行105次即可，恢复代码的时候要注意：</p>
-<ul>
-<li>分析好地址含义，跟踪v2，发现<code>v2[23][1]</code>就是 key 的地址</li>
-<li>忽略不执行的跳转，gameassembly_il2cpp_runtime_class_init)(v2);看名字知道是初始化v2的，一般没用，忽略</li>
-</ul>
-<p>最终复原代码</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;cstdio&gt;</span></span></span><br><span class="line"><span class="keyword">unsigned</span> <span class="keyword">char</span> init[] = &#123; <span class="number">0x14</span>, <span class="number">0x45</span>, <span class="number">0x11</span>, <span class="number">0xAA</span> , <span class="number">0xEF</span> , <span class="number">0xBE</span> , <span class="number">0xAD</span> , <span class="number">0xDE</span> &#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">fun</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	__int64 v2, v3, v4;</span><br><span class="line">	<span class="keyword">char</span> v5;</span><br><span class="line">	<span class="keyword">unsigned</span> __int64 v6;</span><br><span class="line">	__int64 result;</span><br><span class="line">	<span class="keyword">int</span> v0 = <span class="number">4</span>, i;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">do</span> &#123;</span><br><span class="line">		v2 = <span class="number">0</span>;</span><br><span class="line">		v3 = <span class="number">0</span>;</span><br><span class="line">		v4 = <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">do</span></span><br><span class="line">		&#123;</span><br><span class="line">			v5 = v3++ &amp; <span class="number">0x3f</span>;</span><br><span class="line">			v6 = v4 &amp; (*((__int64 *)init));</span><br><span class="line">			v4 = (v4 &lt;&lt; <span class="number">1</span>) | (v4 &gt;&gt; <span class="number">63</span>);</span><br><span class="line">			v2 ^= v6 &gt;&gt; v5;</span><br><span class="line"></span><br><span class="line">		&#125; <span class="keyword">while</span> (v3 &lt; <span class="number">64</span>);</span><br><span class="line"></span><br><span class="line">		result = v2 | <span class="number">2</span> * (*((__int64 *)init));</span><br><span class="line">		(*((__int64 *)init)) = result;</span><br><span class="line"></span><br><span class="line">		--v0;</span><br><span class="line">	&#125; <span class="keyword">while</span> (v0);</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">int</span> i, j;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; <span class="number">105</span>; i += <span class="number">1</span>)</span><br><span class="line">	&#123;</span><br><span class="line">		fun();</span><br><span class="line"></span><br><span class="line">		<span class="keyword">for</span> (j = <span class="number">0</span>; j &lt; <span class="number">8</span>; j++)</span><br><span class="line">		&#123;</span><br><span class="line">			<span class="built_in">printf</span>(<span class="string">&quot;%x &quot;</span>, init[j]);</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="built_in">putchar</span>(<span class="number">10</span>);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>得到的最后一个输出就是key了，CE修改一下，再次GetFlag，得到flag</p>
-<p><img src="/picture/1/%E5%BE%AE%E4%BF%A1%E6%88%AA%E5%9B%BE_20210516170828.png"></p>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">reverse</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2021/05/16/MRCTF2021%E9%80%86%E5%90%91Ezgame/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
   
     <nav id="page-nav">
-      <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" href="/page/2/">Next &amp;raquo;</a>
+      <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><a class="extend next" rel="next" href="/page/2/">Next &amp;raquo;</a>
     </nav>
   
 
@@ -1474,6 +1484,10 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">z3</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">双进程守护</a>
               </li>
              
               <li class="article-tag-list-item">
