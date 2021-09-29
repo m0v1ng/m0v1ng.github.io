@@ -6,15 +6,34 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://example.com">
-  <title>Archives: 2021/9 | Hexo</title>
+  <title>流量分析实验 | Hexo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="Hexo">
-<meta property="og:url" content="http://example.com/archives/2021/09/index.html">
+  <meta name="description" content="LAB1wireshark分析tcp通讯发的图片 在流量中查找字符串  第一个就是有 字符串 “flag” 的 tcp 流，右键-跟踪流-TCP流">
+<meta property="og:type" content="article">
+<meta property="og:title" content="流量分析实验">
+<meta property="og:url" content="http://example.com/2021/09/29/%E6%B5%81%E9%87%8F%E5%88%86%E6%9E%90%E5%AE%9E%E9%AA%8C/index.html">
 <meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="LAB1wireshark分析tcp通讯发的图片 在流量中查找字符串  第一个就是有 字符串 “flag” 的 tcp 流，右键-跟踪流-TCP流">
 <meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://raw.githubusercontent.com/m0v1ng/images/master/2021-09/20210929004102.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/m0v1ng/images/master/2021-09/20210929002018.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/m0v1ng/images/master/2021-09/20210929002113.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/m0v1ng/images/master/2021-09/20210929003050.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/m0v1ng/images/master/2021-09/20210929003136.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/m0v1ng/images/master/2021-09/20210929003254.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/m0v1ng/images/master/2021-09/20210929003433.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/m0v1ng/images/master/2021-09/20210929010022.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/m0v1ng/images/master/2021-09/20210929011341.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/m0v1ng/images/master/2021-09/20210929070953.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/m0v1ng/images/master/2021-09/20210929084403.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/m0v1ng/images/master/2021-09/20210929084252.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/m0v1ng/images/master/2021-09/20210929084855.png">
+<meta property="article:published_time" content="2021-09-29T15:36:23.000Z">
+<meta property="article:modified_time" content="2021-09-29T15:37:01.127Z">
 <meta property="article:author" content="John Doe">
+<meta property="article:tag" content="misc">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/m0v1ng/images/master/2021-09/20210929004102.png">
   
     <link rel="alternative" href="/atom.xml" title="Hexo" type="application/atom+xml">
   
@@ -150,36 +169,85 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
-  
-  
+            <article id="post-流量分析实验" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
     
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2021" class="archive-year">2021</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2021/09/29/%E6%B5%81%E9%87%8F%E5%88%86%E6%9E%90%E5%AE%9E%E9%AA%8C/" class="archive-article-date">
-  	<time datetime="2021-09-29T15:36:23.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-09-29</time>
-</a>
-        </div>
-    	 
+      <header class="article-header">
+        
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2021/09/29/%E6%B5%81%E9%87%8F%E5%88%86%E6%9E%90%E5%AE%9E%E9%AA%8C/">流量分析实验</a>
+    <h1 class="article-title" itemprop="name">
+      流量分析实验
     </h1>
   
 
-        <div class="article-info info-on-right">
-          
+        
+        <a href="/2021/09/29/%E6%B5%81%E9%87%8F%E5%88%86%E6%9E%90%E5%AE%9E%E9%AA%8C/" class="archive-article-date">
+  	<time datetime="2021-09-29T15:36:23.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-09-29</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="LAB1"><a href="#LAB1" class="headerlink" title="LAB1"></a>LAB1</h1><p>wireshark分析tcp通讯发的图片</p>
+<p>在流量中查找字符串</p>
+<p><img src="https://raw.githubusercontent.com/m0v1ng/images/master/2021-09/20210929004102.png"></p>
+<p>第一个就是有 字符串 “flag” 的 tcp 流，右键-跟踪流-TCP流</p>
+<a id="more"></a>
+
+<p>发现有flag.png字眼，但是没有png格式的数据流，可能下一个tcp stream 就是传文件了</p>
+<p>追踪下一个tcp 流，看到了 PNG 格式的数据流</p>
+<p><img src="https://raw.githubusercontent.com/m0v1ng/images/master/2021-09/20210929002018.png"></p>
+<p>以原始数据导出，丢入010editor提取出来即可</p>
+<p><img src="https://raw.githubusercontent.com/m0v1ng/images/master/2021-09/20210929002113.png"></p>
+<p>关于tcp连接</p>
+<h3 id="tcp三次握手"><a href="#tcp三次握手" class="headerlink" title="tcp三次握手"></a>tcp三次握手</h3><p><img src="https://raw.githubusercontent.com/m0v1ng/images/master/2021-09/20210929003050.png"></p>
+<p><img src="https://raw.githubusercontent.com/m0v1ng/images/master/2021-09/20210929003136.png"></p>
+<h3 id="通讯中"><a href="#通讯中" class="headerlink" title="通讯中"></a>通讯中</h3><p><img src="https://raw.githubusercontent.com/m0v1ng/images/master/2021-09/20210929003254.png"></p>
+<h3 id="tcp4次握手分别"><a href="#tcp4次握手分别" class="headerlink" title="tcp4次握手分别"></a>tcp4次握手分别</h3><p><img src="https://raw.githubusercontent.com/m0v1ng/images/master/2021-09/20210929003433.png"></p>
+<h1 id="LAB2"><a href="#LAB2" class="headerlink" title="LAB2"></a>LAB2</h1><p>ICMP协议：主要用于测试两台主机能否正常通信</p>
+<p>搜索字符串，发现flag在 ICMP 协议上</p>
+<p><img src="https://raw.githubusercontent.com/m0v1ng/images/master/2021-09/20210929010022.png"></p>
+<h1 id="LAB3"><a href="#LAB3" class="headerlink" title="LAB3"></a>LAB3</h1><p><a target="_blank" rel="noopener" href="http://blog.sina.com.cn/s/blog_69b5d2a50101ekz5.html">http://blog.sina.com.cn/s/blog_69b5d2a50101ekz5.html</a></p>
+<p>蓝牙使用的是 OBEX 协议，直接搜就可以了</p>
+<p>导出分组字节流</p>
+<p><img src="https://raw.githubusercontent.com/m0v1ng/images/master/2021-09/20210929011341.png"></p>
+<h1 id="LAB4"><a href="#LAB4" class="headerlink" title="LAB4"></a>LAB4</h1><p>EAP是Extensible Authentication Protocol的缩写，EAPOL就是(EAP OVER LAN )基于局域网的扩展认证协议。 EAPOL是基于802.1X网络访问认证技术发展而来的。</p>
+<p>EAP是一个普遍使用的认证机制，它常被用于<strong>无线网络</strong>或点到点的连接中</p>
+<p>EAP主要有四次握手进行认证</p>
+<p>结合wireshark抓到的报文，讲解wpa2-psk四次握手过程：<a target="_blank" rel="noopener" href="https://blog.csdn.net/Mr_gui_/article/details/113403996">https://blog.csdn.net/Mr_gui_/article/details/113403996</a></p>
+<p><img src="https://raw.githubusercontent.com/m0v1ng/images/master/2021-09/20210929070953.png"></p>
+<p>存在四次握手包，直接进行无线密码爆破，用工具crunch 生成字典，aircrack-ng进行爆破</p>
+<p>crunch教程：<a target="_blank" rel="noopener" href="https://www.jianshu.com/p/a3401b0f3d9a">https://www.jianshu.com/p/a3401b0f3d9a</a></p>
+<p>aircrack-ng教程：<a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_42333641/article/details/112789064">https://blog.csdn.net/qq_42333641/article/details/112789064</a></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">(kali㉿kali)-[~/Desktop/traffic]</span><br><span class="line">└─$ crunch 11 11 -t 1391040%%%% &gt;&gt; ./wifipass.txt </span><br><span class="line">Crunch will now generate the following amount of data: 120000 bytes</span><br><span class="line">0 MB</span><br><span class="line">0 GB</span><br><span class="line">0 TB</span><br><span class="line">0 PB</span><br><span class="line">Crunch will now generate the following number of lines: 10000 </span><br><span class="line">                                                                                                               </span><br><span class="line">┌──(kali㉿kali)-[~/Desktop/traffic]</span><br><span class="line">└─$ aircrack-ng -w ./wifipass.txt ./wifi.cap </span><br><span class="line">Reading packets, please wait...</span><br><span class="line">Opening ./wifi.cap</span><br><span class="line">Read 4257 packets.</span><br><span class="line"></span><br><span class="line"><span class="meta">   #</span><span class="bash">  BSSID              ESSID                     Encryption</span></span><br><span class="line"></span><br><span class="line">   1  3C:E5:A6:20:91:60  CATR                      Unknown</span><br><span class="line">   2  3C:E5:A6:20:91:61  CATR-GUEST                Unknown</span><br><span class="line">   3  BC:F6:85:9E:4E:A3  D-Link_DIR-600A           WPA (1 handshake, with PMKID)</span><br><span class="line"></span><br><span class="line">Index number of target network ? </span><br><span class="line">3</span><br><span class="line"></span><br><span class="line">Reading packets, please wait...</span><br><span class="line">Opening ./wifi.cap</span><br><span class="line">Read 4257 packets.</span><br><span class="line"></span><br><span class="line">1 potential targets</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">                               Aircrack-ng 1.6 </span><br><span class="line"></span><br><span class="line">      [00:00:02] 9908/10000 keys tested (4599.28 k/s) </span><br><span class="line"></span><br><span class="line">      Time left: 0 seconds                                      99.08%</span><br><span class="line"></span><br><span class="line">                          KEY FOUND! [ 13910407686 ]</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<h1 id="LAB5"><a href="#LAB5" class="headerlink" title="LAB5"></a>LAB5</h1><p>题目与苍蝇有关，搜索一下fly，看到个fly.rar，跟踪 http流，看到是在通过 http 以 post 方式传文件</p>
+<p><img src="https://raw.githubusercontent.com/m0v1ng/images/master/2021-09/20210929084403.png"></p>
+<p> http.request.method==POST 过滤，找到 post 的数据</p>
+<p><img src="https://raw.githubusercontent.com/m0v1ng/images/master/2021-09/20210929084252.png"></p>
+<p>有一个CreateFile，一个CheckFile，夹在中间的应该就是 数据，wireshark提取post的数据</p>
+<p>但是5个post数据的字节数总和大于 rar文件size 525701了，应该是 post的数据又遵从另外的一种协议，具体协议是什么不清楚，可能是 Host: set2.mail.qq.com 自定义的 协议，也可能是个tcp</p>
+<p>利用文件大小差异计算一个协议头所占的字节数，也算一种侧信道攻击了</p>
+<blockquote>
+<p>131436*4+1777=527521<br>527521-525701=1820<br>1820/5=364</p>
+</blockquote>
+<p>协议头大小就为364</p>
+<p>依次把五个文件去掉文件头保存到另一文件</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">dd <span class="keyword">if</span>=<span class="number">1</span> bs=<span class="number">1</span> skip=<span class="number">364</span> of=<span class="number">1.1</span></span><br><span class="line"></span><br><span class="line">dd命令语法：</span><br><span class="line"><span class="keyword">if</span> 输入文件名</span><br><span class="line">bs 设置每次读写块的大小为<span class="number">1</span>字节 </span><br><span class="line">skip 指定从输入文件开头跳过多少个块后再开始复制</span><br><span class="line">of 输出文件名</span><br></pre></td></tr></table></figure>
+<p>然后再用linux的输入流来合并成一个文件：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cat <span class="number">1.1</span> <span class="number">2.1</span> <span class="number">3.1</span> <span class="number">4.1</span> <span class="number">5.1</span> &gt; fly.rar</span><br></pre></td></tr></table></figure>
+<p>然后fly.rar又被伪加密了，所以需要将这个文件用010edit打开后，将其中的74 84改为74 80</p>
+<p><img src="https://raw.githubusercontent.com/m0v1ng/images/master/2021-09/20210929084855.png"></p>
+<p>得到一个exe，执行这个exe就会有很多苍蝇在屏幕飞，360直接把他报毒了</p>
+<p>binwalk+foremost 提取到 flag的二维码即可</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
@@ -191,172 +259,119 @@
 		</ul>
 	</div>
 
-          
+      
 
+      
+
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
         </div>
-        <div class="clearfix"></div>
-    </header>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//pan.baidu.com/share/qrcode?url=http://example.com/2021/09/29/%E6%B5%81%E9%87%8F%E5%88%86%E6%9E%90%E5%AE%9E%E9%AA%8C/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
+
   
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2021/09/25/frida%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" class="archive-article-date">
-  	<time datetime="2021-09-25T15:25:46.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-09-25</time>
-</a>
+<nav id="article-nav">
+  
+  
+    <a href="/2021/09/25/frida%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">frida学习笔记</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
         </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2021/09/25/frida%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">frida学习笔记</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">frida</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">android</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
+        
+        
+        <div class="toc-container tooltip-left">
+            <i class="icon-font icon-category"></i>
+            <div class="tooltip tooltip-east">
+                <span class="tooltip-item">
+                </span>
+                <span class="tooltip-content">
+                    <div class="toc-article">
+                    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#LAB1"><span class="toc-number">1.</span> <span class="toc-text">LAB1</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#tcp%E4%B8%89%E6%AC%A1%E6%8F%A1%E6%89%8B"><span class="toc-number">1.0.1.</span> <span class="toc-text">tcp三次握手</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%80%9A%E8%AE%AF%E4%B8%AD"><span class="toc-number">1.0.2.</span> <span class="toc-text">通讯中</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#tcp4%E6%AC%A1%E6%8F%A1%E6%89%8B%E5%88%86%E5%88%AB"><span class="toc-number">1.0.3.</span> <span class="toc-text">tcp4次握手分别</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#LAB2"><span class="toc-number">2.</span> <span class="toc-text">LAB2</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#LAB3"><span class="toc-number">3.</span> <span class="toc-text">LAB3</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#LAB4"><span class="toc-number">4.</span> <span class="toc-text">LAB4</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#LAB5"><span class="toc-number">5.</span> <span class="toc-text">LAB5</span></a></li></ol>
+                    </div>
+                </span>
+            </div>
         </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
+        
+    </div>
+</aside>
+
+
+
   
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2021/09/17/MSF%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" class="archive-article-date">
-  	<time datetime="2021-09-17T16:39:57.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-09-17</time>
-</a>
-        </div>
-    	 
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2021/09/17/MSF%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">MSF学习笔记</a>
-    </h1>
   
 
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2021/09/14/SangForCTF%E9%80%86%E5%90%91safe-box%E9%A2%98%E8%A7%A3/" class="archive-article-date">
-  	<time datetime="2021-09-14T07:11:06.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-09-14</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2021/09/14/SangForCTF%E9%80%86%E5%90%91safe-box%E9%A2%98%E8%A7%A3/">SangForCTF逆向safe_box题解</a>
-    </h1>
   
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">reverse</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">双进程守护</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2021/09/13/AllesCTF2021%E9%80%86%E5%90%91Monstrosity%E9%A2%98%E8%A7%A3/" class="archive-article-date">
-  	<time datetime="2021-09-14T04:57:16.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-09-13</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2021/09/13/AllesCTF2021%E9%80%86%E5%90%91Monstrosity%E9%A2%98%E8%A7%A3/">AllesCTF2021逆向Monstrosity题解</a>
-    </h1>
   
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">reverse</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">c#</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
   
-  
-    </div></section>
-  
-
-    
 
 
           </div>
@@ -379,8 +394,8 @@
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: false,
-		isArchive: true,
+		isPost: true,
+		isArchive: false,
 		isTag: false,
 		isCategory: false,
 		open_in_new: false,
